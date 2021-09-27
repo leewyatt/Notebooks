@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+	 viewBox="0 0 16 16" width="16" height="16">
+<g>
+	<rect x="1" y="2" fill-rule="evenodd" clip-rule="evenodd" fill="#6E6E6E" width="2" height="12"/>
+	<rect x="13" y="2" fill-rule="evenodd" clip-rule="evenodd" fill="#6E6E6E" width="2" height="12"/>
+	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#6E6E6E" points="12,8 9,4.5 9,11.5 	"/>
+	<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#6E6E6E" points="4,8 7,4.5 7,11.5 	"/>
+</g>
+</svg>

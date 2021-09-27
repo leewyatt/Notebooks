@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 13" width="13" height="13">
+    <path fill="url(#linear_color)" d="M6.7,1.8L9,4.1L3.6,9.5L1.2,7.2L6.7,1.8z M9.7,1.1c0.6,0.6,0.6,1.7,0,2.3l0,0L9.5,3.7L7.1,1.3L7.4,1
+	C8,0.4,9.1,0.4,9.7,1.1L9.7,1.1z M0.5,9.7l0.3-2.1L3.2,10L1,10.3c-0.3,0-0.5-0.1-0.5-0.4C0.5,9.8,0.5,9.8,0.5,9.7z"/>
+    <path fill="url(#linear_color)" d="M1.1,11.4h10.8c0.4,0,0.6,0.2,0.6,0.6l0,0c0,0.4-0.2,0.6-0.6,0.6H1.1c-0.4,0-0.6-0.2-0.6-0.6l0,0
+	C0.5,11.6,0.7,11.4,1.1,11.4z"/>
+    <path fill="url(#linear_color)" d="M6.2,9.1h5.7c0.4,0,0.6,0.2,0.6,0.6l0,0c0,0.4-0.2,0.6-0.6,0.6H6.2c-0.4,0-0.6-0.2-0.6-0.6l0,0
+	C5.6,9.3,5.8,9.1,6.2,9.1z"/>
+    <defs>
+        <linearGradient id="linear_color" x1="0.7739" y1="11.4748" x2="10.6203" y2="1.6284"
+                        gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 -1 0 12.8898)">
+            <stop offset="0.17" stop-color="#07C3F2"/>
+            <stop offset="0.9699" stop-color="#087CFA"/>
+        </linearGradient>
+    </defs>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="linear-gradient" x1="3.834" y1="7.627" x2="8.308" y2="12.101" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00981c"/>
+      <stop offset="1" stop-color="#005e11"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="5.022" y1="8.022" x2="8.015" y2="11.015" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b2ff00"/>
+      <stop offset="1" stop-color="#90ce00"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-3" x1="10.107" y1="1.572" x2="14.484" y2="5.948" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#86471a"/>
+      <stop offset="1" stop-color="#470000"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-4" x1="12.061" y1="2" x2="12.061" y2="5.946" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fdffc6"/>
+      <stop offset="1" stop-color="#ff9029"/>
+    </linearGradient>
+  </defs>
+  <g id="areas">
+    <rect width="16" height="16" fill="#ffe5ff" opacity="0"/>
+  </g>
+  <g id="icons">
+    <g>
+      <polygon points="1 15 5.414 15 13.414 7 9 2.586 1 10.586 1 15" fill="url(#linear-gradient)"/>
+      <path d="M2.707,10.293,9.5,3.5l3,3L5.707,13.293ZM2,11l3,3H2Z" fill="url(#linear-gradient-2)"/>
+      <path d="M8.707,2.879,10,1.586a2,2,0,0,1,2.829,0l1.585,1.586a2,2,0,0,1,0,2.828L13.121,7.293Z" fill="url(#linear-gradient-3)"/>
+      <path d="M13.121,5.879l.586-.586a1,1,0,0,0,0-1.414L12.121,2.293a1,1,0,0,0-1.414,0l-.586.586Z" fill="url(#linear-gradient-4)"/>
+      <rect x="2.568" y="7.336" width="8.485" height="0.707" transform="translate(-3.443 7.068) rotate(-45)" fill="#fff"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    // https://github.com/JetBrains/gradle-intellij-plugin
+    id 'org.jetbrains.intellij' version '0.7.3'
+}
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+runIde {
+    jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
+}
+group 'com.itcodebox'
+//version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+//    implementation fileTree(dir: 'libs', include: ['clion.jar', 'rider.jar'])
+
+    implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    implementation group: 'commons-dbutils', name: 'commons-dbutils', version: '1.7'
+    implementation group: 'commons-pool', name: 'commons-pool', version: '1.6'
+    //存在于IDEAxx\lib 目录下 ,但是webstorm等并不包含SQLite包
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.34.0'
+    // https://mvnrepository.com/artifact/javax.activation/javax.activation-api
+    //存在于IDEAxx\lib 目录下, 但是目前idea还是可以使用这个java8的类,11及以后的java版本,不存在这个包, 需要自己添加javax的依赖
+    implementation group: 'javax.activation', name: 'javax.activation-api', version: '1.2.0'
+
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version "203.6682.168"
+    pluginName 'Notebook'
+    updateSinceUntilBuild false
+//    plugins = ["com.intellij.java", "org.jetbrains.kotlin", "Dart:203.5981.155","org.intellij.plugins.markdown"]
+    plugins = ["com.intellij.java", "org.jetbrains.kotlin"]
+}
+patchPluginXml {
+    sinceBuild "203.6682.168"
+}
+
+//patchPluginXml {
+//    changeNotes """
+//      Add change notes here.<br>
+//      <em>most HTML tags may be used</em>"""
+//}
+test {
+    useJUnitPlatform()
+}
+

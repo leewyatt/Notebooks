@@ -1,0 +1,155 @@
+<idea-plugin>
+    <id>com.itcodebox.leewyatt.notebooks.id</id>
+    <name>Notebook</name>
+    <version>1.38</version>
+    <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
+
+    <description><![CDATA[
+        <head>
+            <style type="text/css">
+                span {
+                    color: #2675BF;
+                    font-weight: bold;
+                }
+
+                li{
+                    margin-top: 7px;
+                }
+            </style>
+        </head>
+        <body>
+        <p>This is a note plugin. Support: store, manage, import, export notes.Support adding images as attachments</p>
+        <ul>
+            <li style='margin-top:0px'>Three level directory is used to store notes: <br/><span>Notebook</span> > <span>Chapter</span> >
+                <span>Note</span></li>
+            <li><span>Compact View</span>: Suitable for small screens</li>
+            <li><span>Full View</span>: Suitable for large screens or organize notes</li>
+            <li>The list's item in the toolWindow can be dragged up and down to change the display position.</li>
+            <li>Move Chapter: Dragging chapter to another notebook.</li>
+            <li>Move Note: Dragging note to another chapter.</li>
+            <li>Use the popup menu(contextMenu) item <span>Add to Notebook</span> can add the selected code or text to the
+                notebook.
+            </li>
+            <li>Use the popup menu(contextMenu) item <span>Insert note into editor</span> can insert the content of the note
+                into the editor.
+            </li>
+            <li>Notebook's toolWindow button <span>Export JSON</span>/<span>Import JSON</span> Support export or import data.
+            </li>
+            <li>Notebook's toolWindow button <span>Export Markdown</span> Support exporting notes in <span>Markdown</span>
+                format.
+            </li>
+            <li><span>File | Settings | Tools | Notebook</span>: Support custom Markdown template .</li>
+            <li>Notebook's toolWindow button <span>Tips for using</span>: <span>More tips</span> and
+                <span>picture descriptions</span> can be displayed.
+            </li>
+        </ul>
+
+        <p style='margin-top:10px'>这是一款笔记插件，支持笔记的存储，管理，导入，导出等。支持添加图片作为笔记的附件</p>
+        <ul>
+            <li style='margin-top:0px'>使用三级目录来存储和管理笔记: <br/><span>笔记本</span> > <span>章节</span> > <span>笔记</span></li>
+            <li><span>精简视图</span>: 适合小屏幕</li>
+            <li><span>完整视图</span>: 适合大屏幕;显示更直观,拖拉操作更方便</li>
+            <li>笔记本工具窗口列表中的条目,支持上下拖动来改变的位置。</li>
+            <li>移动章节: 拖动章节条目到另一个的笔记本条目上。</li>
+            <li>移动笔记: 拖动笔记条目到另一个的章节条目上。</li>
+            <li>在编辑器使用弹出菜单项(上下文菜单项)<span>收藏到笔记本</span>可以把选择的代码或文字存储为笔记。</li>
+            <li>在编辑器使用弹出菜单项(上下文菜单项)<span>插入笔记内容</span>可以把选择的笔记内容插入到编辑器。</li>
+            <li>笔记本的工具窗口上的按钮<span>导出 JSON</span>/<span>导入 JSON</span>支持导入或者导出笔记。</li>
+            <li>笔记本的工具窗口上的按钮<span>导出 Markdown</span>支持把选择的笔记导出为<span>Markdown</span>格式。</li>
+            <li><span>File | Settings | Tools | 笔记本</span>: 支持自定义Markdown模板。</li>
+            <li>笔记本的工具窗口上的按钮<span>小提示</span>: 可以显示更多的使用提示和图片描述。</li>
+        </ul>
+        如果需要提交Bug或者提出建议,请加QQ群: <b>715598051</b><br/>
+        Thanks <b>@Yii.Guxing</b> ; <b>@albert flex</b>; <b>@因为许多.许多！</b>;<b>@来日方长</b> <br/>
+        </body>
+
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <ul>
+          <li>Add shortcut keys to the search action (default: Alt + S).</li>
+          <li>Adjusted the search dialog's UI.</li>
+          <li>给搜索功能添加快捷键(默认: ALT + S).</li>
+          <li>调整了搜索界面.</li>
+        </ul>
+    ]]></change-notes>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <!--    <idea-version since-build="203.8084.24"/>-->
+    <idea-version since-build="203.6682.168"/>
+
+    <resource-bundle>messages.NotebooksBundle</resource-bundle>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <!--    <depends>org.intellij.plugins.markdown</depends>-->
+    <!-- 如果需要查询Java的包名等情况,需要该xx.java依赖,高亮之类的也需要 -->
+    <!--    <depends>com.intellij.modules.java</depends>-->
+    <!--  Kotlin高亮  -->
+    <!--    <depends>org.jetbrains.kotlin</depends>-->
+    <depends optional="true" config-file="kotlin-doc.xml">org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="java-doc.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="json-doc.xml">com.intellij.modules.json</depends>
+    <depends optional="true" config-file="xml-doc.xml">com.intellij.modules.xml</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 当ToolWindow处于打开状态时, 这个 postStartupActivity居然比ToolWindow还晚启动 ;
+            public class StartUpWork implements StartupActivity
+            -->
+        <postStartupActivity implementation="com.itcodebox.notebooks.projectservice.StartUpWork"/>
+        <!--   APP级别的数据库相关的服务     -->
+        <applicationService serviceImplementation="com.itcodebox.notebooks.service.DatabaseBasicService"/>
+        <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.NotebookServiceImpl"/>
+        <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.ChapterServiceImpl"/>
+        <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.NoteServiceImpl"/>
+        <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.SearchRecordServiceImpl"/>
+        <!--   APP级别的持久化(主要是全局设置)     -->
+        <applicationService serviceImplementation="com.itcodebox.notebooks.ui.toolsettings.AppSettingsState"/>
+
+        <!--   项目级服务: 界面的显示以及与其他项目界面的通信  -->
+        <projectService serviceImplementation="com.itcodebox.notebooks.projectservice.NotebooksUIManager"/>
+        <!--   项目级别的持久化(选择的item,Pane的显示与隐藏 等状态的持久化)     -->
+        <projectService serviceImplementation="com.itcodebox.notebooks.projectservice.ProjectStorage"/>
+
+        <toolWindow factoryClass="com.itcodebox.notebooks.ui.NoteWindowFactory"
+                    id="Notebook"
+                    anchor="right"
+                    secondary="true"
+                    icon="PluginIcons.ToolWindowBlue"/>
+        <applicationConfigurable parentId="tools"
+                                 instance="com.itcodebox.notebooks.ui.toolsettings.AppSettingsConfigurable"
+                                 id="com.itcodebox.notebooks.ui.toolsettings.AppSettingsConfigurable"/>
+
+        <!--   状态栏添加小组件, 显示光标目前的offset_start和offset_end     -->
+        <!--        <statusBarWidgetFactory id="com.itcodebox.notebooks.ui.widget.SelectionRangeWidgetFactory"-->
+        <!--                                implementation="com.itcodebox.notebooks.ui.widget.SelectionRangeWidgetFactory"-->
+        <!--                                order="before memoryUsageWidget"/>-->
+    </extensions>
+
+    <actions>
+        <!-- Editor popupMenu 把代码插入到Editor -->
+        <action id="com.itcodebox.notebooks.action.EditorInsertCodeAction"
+                class="com.itcodebox.notebooks.action.EditorInsertCodeAction"
+                icon="PluginIcons.InsertPopup">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl BACK_SLASH"/>
+        </action>
+
+        <!-- Editor popupMenu 添加到笔记本 -->
+        <action id="com.itcodebox.notebooks.action.EditorAddNoteAction"
+                class="com.itcodebox.notebooks.action.EditorAddNoteAction"
+                icon="PluginIcons.ToolWindowBlue">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <keyboard-shortcut first-keystroke="ctrl BACK_SLASH" keymap="$default"/>
+        </action>
+
+        <action id="com.itcodebox.notebooks.action.SearchRecordAction"
+                class="com.itcodebox.notebooks.action.SearchRecordAction"
+                icon="PluginIcons.Search">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <keyboard-shortcut first-keystroke="alt s" keymap="$default"/>
+        </action>
+    </actions>
+
+</idea-plugin>

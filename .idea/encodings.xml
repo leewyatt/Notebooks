@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/libs" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/action-group.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/csharp-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/css-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/dart-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/go-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/groovy-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/java-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/javaScript-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/json-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/jsp-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/kotlin-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/oc-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/php-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/properties-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/python-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/rest-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/ruby-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/scala-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/shell-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/sql-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/swift-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/vue-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/xml-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/xpath-doc.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/META-INF/yaml-doc.xml" charset="GBK" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>
