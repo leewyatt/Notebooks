@@ -503,6 +503,7 @@ public class NotebooksUIManager {
         if (eventProject == project) {
             projectStorage.selectedNoteId = note.getId();
         }
+
         if (mainPanel == null) {
             return;
         }
