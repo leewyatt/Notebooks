@@ -123,6 +123,10 @@ public class DetailPanel extends JPanel {
     private final JPanel descScrollPane;
     private final JBCheckBox checkBox = new JBCheckBox();
 
+    public Editor getFieldContent() {
+        return fieldContent;
+    }
+
     public JBTextArea getFieldDesc() {
         return fieldDesc;
     }

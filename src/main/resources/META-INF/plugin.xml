@@ -150,6 +150,11 @@
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut first-keystroke="alt s" keymap="$default"/>
         </action>
+	    <action id="ActivateNotebookToolWindow" class="com.itcodebox.notebooks.action.ActivateNotebookAction"
+	            text="ActivateNotebook">
+		    <add-to-group group-id="WindowMenu" anchor="first"/>
+		    <keyboard-shortcut keymap="$default" first-keystroke="alt O"/>
+	    </action>
     </actions>
 
 </idea-plugin>
