@@ -13,5 +13,6 @@ public enum SearchMode {
     NoteAndDescription,
     NoteAndContentAndDescription,
     Chapter,
-    Notebook
+    Notebook,
+    None
 }
