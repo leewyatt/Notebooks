@@ -131,6 +131,14 @@ public class DetailPanel extends JPanel {
         return fieldDesc;
     }
 
+    public JComponent getNorthPanel() {
+        return northPanel;
+    }
+
+    public JPanel getDescScrollPane() {
+        return descScrollPane;
+    }
+
     public DetailPanel(Project project, NotebookTable notebookTable, ChapterTable chapterTable, NoteTable noteTable) {
         this.project = project;
         this.notebookTable = notebookTable;

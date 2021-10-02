@@ -21,6 +21,8 @@ import com.itcodebox.notebooks.ui.tables.NotebookTable;
 import com.itcodebox.notebooks.utils.FocusUtil;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+
 @SuppressWarnings("unchecked")
 public class OpenSearchBarAction extends GotoActionBase {
 
@@ -51,7 +53,18 @@ public class OpenSearchBarAction extends GotoActionBase {
 
                 NotebooksUIManager uiManager = (NotebooksUIManager) ServiceManager.getService(e.getProject(), NotebooksUIManager.class);
                 MainPanel mainPanel = uiManager.getMainPanel();
+                // 通过搜索框打开Notebook自动收缩笔记选择栏
+                JComponent northPanel = mainPanel.getDetailPanel().getNorthPanel();
+                northPanel.setVisible(false);
+                // 此处需要更换相应的Icon
+                // presentation.setIcon(AllIcons.Actions.Expandall);
                 
+                // 通过搜索框打开Notebook自动收缩笔记描述栏
+                JPanel descScrollPane = mainPanel.getDetailPanel().getDescScrollPane();
+                descScrollPane.setVisible(false);
+                // presentation.setIcon(PluginIcons.Show);
+                // presentation.setText(message("detailPanel.action.showDesc.show"));
+
                 NotebookTable notebookTable = mainPanel.getNotebookTable();
                 if (searchRecord.getNotebookId() != null) {
                     notebookTable.selectedRowById(searchRecord.getNotebookId());

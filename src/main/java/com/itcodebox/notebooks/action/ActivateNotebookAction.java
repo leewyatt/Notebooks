@@ -19,10 +19,21 @@ public class ActivateNotebookAction extends DumbAwareAction {
         
         Project eventProject = ActivateToolWindowAction.getEventProject(e);
         ToolWindow toolWindow = ToolWindowManager.getInstance(eventProject).getToolWindow(PluginConstant.TOOLWINDOW_ID);
-        toolWindow.show();
 
         NotebooksUIManager uiManager = ServiceManager.getService(eventProject, NotebooksUIManager.class);
         MainPanel mainPanel = uiManager.getMainPanel();
+        
+        // 如果Notebook已经处于打开状态，则不自动展开①笔记选择栏和②笔记描述栏
+        // 如果Notebook处于关闭未打开状态，则通过该方式打开Notebook会自动展开①和②
+        if (!toolWindow.isVisible()) {
+            toolWindow.show();
+            mainPanel = uiManager.getMainPanel();
+            mainPanel.getDetailPanel().getNorthPanel().setVisible(true);
+            mainPanel.getDetailPanel().getDescScrollPane().setVisible(true);
+            // 此处需要更换相应的Icon
+        }
+        
+        // 打开Notebook时编辑区获取焦点
         FocusUtil.getEditorFocus(mainPanel);
 
     }
