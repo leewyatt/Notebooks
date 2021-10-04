@@ -72,6 +72,8 @@ public class SearchRecordDaoImpl extends BaseDAO<SearchRecord> implements Search
             notebookList.addAll(getRecordList(conn, kws, sqlSearchNote, "note.title like ? or note.content like ? or note.description like ? ", 3));
             notebookList.sort(Comparator.comparing(SearchRecord::toString));
             return notebookList;
+        } else if (SearchMode.None == searchMode) {
+            return getRecordList(conn, sqlSearchNote);
         }
         return new ArrayList<SearchRecord>();
     }
@@ -101,5 +103,18 @@ public class SearchRecordDaoImpl extends BaseDAO<SearchRecord> implements Search
         //注意: 需要在sql语句里写下转义字符用的 转义符号是什么
         builder.append("escape '/'");
         return queryList(conn, builder.toString(), objs);
+    }
+
+    /**
+     * 无条件查询所有笔记
+     * @param conn 
+     * @param sqlSearNote
+     * @return
+     */
+    private List<SearchRecord> getRecordList(Connection conn, String sqlSearNote) {
+        StringBuilder builder = new StringBuilder(512);
+        builder.append(sqlSearNote);
+        builder.append("1=1");
+        return this.queryList(conn, builder.toString());
     }
 }

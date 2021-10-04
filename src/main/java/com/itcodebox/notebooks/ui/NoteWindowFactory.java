@@ -53,6 +53,7 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+   
         this.project = project;
         this.mainPanel = new MainPanel(project, toolWindow);
         NotebooksUIManager uiManger = project.getService(NotebooksUIManager.class);

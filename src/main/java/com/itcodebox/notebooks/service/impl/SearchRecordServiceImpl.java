@@ -19,7 +19,7 @@ public class SearchRecordServiceImpl implements SearchRecordService {
     private final DatabaseBasicService databaseBasicService = ApplicationManager.getApplication().getService(DatabaseBasicService.class);
     private final SearchRecordDao searchRecordDao = SearchRecordDaoImpl.getInstance();
 
-    private SearchRecordServiceImpl() {
+    protected SearchRecordServiceImpl() {
     }
 
     public static SearchRecordServiceImpl getInstance() {

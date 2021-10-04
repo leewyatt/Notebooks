@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author LeeWyatt
  */
 public interface PluginConstant {
+
+    String TOOLWINDOW_ID = "Notebook"; 
+    
     /**
      * 图片格式
      */

@@ -15,6 +15,7 @@ import com.intellij.ui.components.*;
 import com.intellij.ui.components.panels.HorizontalBox;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.itcodebox.notebooks.constant.PluginColors;
+import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.entity.SearchMode;
 import com.itcodebox.notebooks.entity.SearchRecord;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
@@ -78,7 +79,7 @@ public class SearchDialog extends DialogWrapper {
         }
 
         NotebooksUIManager uiManager = project.getService(NotebooksUIManager.class);
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Notebook");
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.TOOLWINDOW_ID);
         if (toolWindow == null) {
             super.doOKAction();
             return;

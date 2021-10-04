@@ -123,8 +123,20 @@ public class DetailPanel extends JPanel {
     private final JPanel descScrollPane;
     private final JBCheckBox checkBox = new JBCheckBox();
 
+    public Editor getFieldContent() {
+        return fieldContent;
+    }
+
     public JBTextArea getFieldDesc() {
         return fieldDesc;
+    }
+
+    public JComponent getNorthPanel() {
+        return northPanel;
+    }
+
+    public JPanel getDescScrollPane() {
+        return descScrollPane;
     }
 
     public DetailPanel(Project project, NotebookTable notebookTable, ChapterTable chapterTable, NoteTable noteTable) {
