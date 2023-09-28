@@ -20,7 +20,7 @@ public class ActivateNotebookAction extends DumbAwareAction {
         Project eventProject = ActivateToolWindowAction.getEventProject(e);
         ToolWindow toolWindow = ToolWindowManager.getInstance(eventProject).getToolWindow(PluginConstant.TOOLWINDOW_ID);
 
-        NotebooksUIManager uiManager = ServiceManager.getService(eventProject, NotebooksUIManager.class);
+        NotebooksUIManager uiManager = e.getProject().getService(NotebooksUIManager.class);
         MainPanel mainPanel = uiManager.getMainPanel();
         
         // 如果Notebook已经处于打开状态，则不自动展开①笔记选择栏和②笔记描述栏

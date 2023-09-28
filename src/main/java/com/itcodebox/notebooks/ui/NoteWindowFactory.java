@@ -2,6 +2,7 @@ package com.itcodebox.notebooks.ui;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -59,7 +60,7 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
         NotebooksUIManager uiManger = project.getService(NotebooksUIManager.class);
         uiManger.setMainPanel(mainPanel);
         // 获取内容工厂的实例
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ContentFactory contentFactory = ContentFactory.getInstance();
         // 获取用于toolWindow显示的内容
         Content content = contentFactory.createContent(mainPanel, "", false);
         //给toolWindow设置内容
@@ -73,7 +74,7 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
         // 强制转换
         ToolWindowEx tw = (ToolWindowEx) toolWindow;
         //齿轮上添加 动作按钮
-        SimpleActionGroup gearActions = new SimpleActionGroup();
+        DefaultActionGroup gearActions = new DefaultActionGroup();
         gearActions.add(initActionExportJson());
         gearActions.add(initActionImportJson());
         gearActions.add(new Separator());
