@@ -97,7 +97,7 @@
         <!-- 当ToolWindow处于打开状态时, 这个 postStartupActivity居然比ToolWindow还晚启动 ;
             public class StartUpWork implements StartupActivity
             -->
-        <postStartupActivity implementation="com.itcodebox.notebooks.projectservice.StartUpWork"/>
+        <postStartupActivity implementation="com.itcodebox.notebooks.projectservice.StartUpWork" id="postStartupActivity"/>
         <!--   APP级别的数据库相关的服务     -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.DatabaseBasicService"/>
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.NotebookServiceImpl"/>
@@ -119,6 +119,7 @@
                     icon="PluginIcons.ToolWindowBlue"/>
         <applicationConfigurable parentId="tools"
                                  instance="com.itcodebox.notebooks.ui.toolsettings.AppSettingsConfigurable"
+                                 key="settingPage.name"
                                  id="com.itcodebox.notebooks.ui.toolsettings.AppSettingsConfigurable"/>
 
         <!--   状态栏添加小组件, 显示光标目前的offset_start和offset_end     -->

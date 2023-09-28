@@ -1,7 +1,9 @@
 package com.itcodebox.notebooks.ui.notify;
 
 import com.intellij.notification.*;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.EmptyAction;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -25,7 +27,7 @@ public class NotifyUtil {
 
     public static void showNotification(Project project, String displayId, String title, String content, NotificationType type) {
         Notification notification =  new Notification(PluginConstant.DEFAULT_NOTIFICATION_GROUP_ID,title, content, type);
-        notification.setListener(URL_OPENING_LISTENER);
+        notification.addAction(new EmptyAction());
         Notifications.Bus.notify(notification, project);
     }
 

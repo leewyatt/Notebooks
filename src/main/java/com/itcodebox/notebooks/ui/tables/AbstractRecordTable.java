@@ -66,7 +66,7 @@ public abstract class AbstractRecordTable<T extends Record> extends TableView<T>
         // 单元格的间隙为0
         setIntercellSpacing(new Dimension(0, 0));
         //让TableView可以搜索
-        tableSpeedSearch = new TableSpeedSearch(this);
+        tableSpeedSearch = TableSpeedSearch.installOn(this);
         //让表格支持拖动
         setDragEnabled(true);
         // 设置表格拖动模式为插入行(实现位置的交换)

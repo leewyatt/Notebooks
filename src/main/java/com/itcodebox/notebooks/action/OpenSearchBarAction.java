@@ -51,7 +51,7 @@ public class OpenSearchBarAction extends GotoActionBase {
                 SearchRecord searchRecord = NoteChooseByname.records.parallelStream()
                         .filter(p -> p.toString().equals(chosenElement.getValue())).findFirst().get();
 
-                NotebooksUIManager uiManager = (NotebooksUIManager) ServiceManager.getService(e.getProject(), NotebooksUIManager.class);
+                NotebooksUIManager uiManager = e.getProject().getService(NotebooksUIManager.class);
                 MainPanel mainPanel = uiManager.getMainPanel();
                 // 通过搜索框打开Notebook自动收缩笔记选择栏
                 JComponent northPanel = mainPanel.getDetailPanel().getNorthPanel();
