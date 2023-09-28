@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.38</version>
+    <version>1.39</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
