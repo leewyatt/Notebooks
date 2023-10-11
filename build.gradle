@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     // https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '1.10.1'
+    id 'org.jetbrains.intellij' version '1.15.0'
 }
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
@@ -40,15 +40,15 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    setVersion "2023.2.2"
-    setType "IU"
+    setVersion "2023.2.1"
+    setType "IC"
     setPluginName 'Notebook'
     setUpdateSinceUntilBuild false
 //    plugins = ["com.intellij.java", "org.jetbrains.kotlin", "Dart:203.5981.155","org.intellij.plugins.markdown"]
     plugins = ["com.intellij.java", "org.jetbrains.kotlin"]
 }
 patchPluginXml {
-    setSinceBuild "203.*"
+    setSinceBuild "232.9559.62"
 }
 
 //patchPluginXml {

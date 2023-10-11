@@ -168,7 +168,7 @@ public class DetailPanel extends JPanel {
         northPanel = buildTopPanel();
         add(northPanel, BorderLayout.NORTH);
         //2. -------------创建中间的界面-------------
-        centerPanel.add(getNoteToolbar(), BorderLayout.NORTH);
+        centerPanel.add(getNoteToolbar(centerPanel), BorderLayout.NORTH);
 
         //1. 笔记描述和笔记内容的容器
         JBSplitter textPanel = new JBSplitter(true, 0.15F);
@@ -288,7 +288,7 @@ public class DetailPanel extends JPanel {
         navPanel.add(boxWest, BorderLayout.WEST);
 
         JPanel box = new JPanel(new GridLayout(4, 1));
-        box.add(getVisiblePanelToolbar());
+        box.add(getVisiblePanelToolbar(box));
         box.add(comboBoxNotebook);
         box.add(comboBoxChapter);
         box.add(comboBoxNote);
@@ -608,7 +608,7 @@ public class DetailPanel extends JPanel {
 
     }
 
-    private JComponent getVisiblePanelToolbar() {
+    private JComponent getVisiblePanelToolbar(JComponent target) {
         ActionManager actionManager = ActionManager.getInstance();
         DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP_VISIBLE_PANEL", false);
         actionGroup.addSeparator();
@@ -618,10 +618,11 @@ public class DetailPanel extends JPanel {
         actionGroup.add(initDetailVisibleAction());
 
         ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_GROUP_VISIBLE_PANEL", actionGroup, true);
+        actionToolbar.setTargetComponent(target);
         return actionToolbar.getComponent();
     }
 
-    private JComponent getNoteToolbar() {
+    private JComponent getNoteToolbar(JComponent target) {
         ActionManager actionManager = ActionManager.getInstance();
         DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP_NOTE", false);
         actionGroup.add(initSearchAction());
@@ -637,6 +638,7 @@ public class DetailPanel extends JPanel {
         actionGroup.addSeparator();
 
         ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_GROUP_NOTE", actionGroup, true);
+        actionToolbar.setTargetComponent(target);
         JComponent component = actionToolbar.getComponent();
         component.setBorder(new BottomLineBorder());
         return component;
