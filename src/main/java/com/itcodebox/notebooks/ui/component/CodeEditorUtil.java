@@ -118,7 +118,6 @@ public class CodeEditorUtil {
         editorSettings.setAdditionalLinesCount(3);
         editorSettings.setLineNumbersShown(true);
         editorSettings.setCaretRowShown(true);
-
         return editor;
     }
 

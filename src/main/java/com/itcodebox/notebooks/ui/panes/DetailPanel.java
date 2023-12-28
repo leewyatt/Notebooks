@@ -122,6 +122,7 @@ public class DetailPanel extends JPanel {
     private final JComponent northPanel;
     private final JPanel descScrollPane;
     private final JBCheckBox checkBox = new JBCheckBox();
+    private final JBCheckBox checkBox2 = new JBCheckBox();
 
     public Editor getFieldContent() {
         return fieldContent;
@@ -181,6 +182,7 @@ public class DetailPanel extends JPanel {
         // 设置笔记的内容组件
         JPanel contentScrollPane = new JPanel(new BorderLayout(0, 0));
         initFieldFileType(project, noteTable);
+        // 自动换行按钮
         contentScrollPane.add(initFileTypePanel(), BorderLayout.NORTH);
         //无需多余的JBScrollPane; 否则滚动会出现问题
         contentScrollPane.add(fieldContent.getComponent());
@@ -256,6 +258,12 @@ public class DetailPanel extends JPanel {
         JPanel fieldPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         fieldPanel.add(fieldFileType);
         typeBox.add(fieldPanel);
+        checkBox2.setText(message("menu.item.autoWarp"));
+        checkBox2.setSelected(true);
+        checkBox2.addActionListener(e->{
+            fieldContent.getSettings().setUseSoftWraps(checkBox2.isSelected());
+        });
+        fieldPanel.add(checkBox2);
         return typeBox;
     }
 

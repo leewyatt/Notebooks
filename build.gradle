@@ -18,7 +18,10 @@ group 'com.itcodebox'
 //version '1.0'
 
 repositories {
-    mavenCentral()
+    println "aliyun repositories ${project.name}"
+    maven { url 'https://maven.aliyun.com/repository/central' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
+//    mavenCentral()
 }
 
 dependencies {
