@@ -3,37 +3,23 @@ package com.itcodebox.notebooks.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.application.*;
+import com.intellij.openapi.progress.*;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.*;
+import com.intellij.openapi.ui.messages.MessagesService;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.itcodebox.notebooks.constant.PluginConstant;
-import com.itcodebox.notebooks.entity.Chapter;
-import com.itcodebox.notebooks.entity.Note;
-import com.itcodebox.notebooks.entity.Notebook;
+import com.itcodebox.notebooks.entity.*;
 import com.itcodebox.notebooks.projectservice.RecordListener;
-import com.itcodebox.notebooks.service.impl.ChapterServiceImpl;
-import com.itcodebox.notebooks.service.impl.NoteServiceImpl;
-import com.itcodebox.notebooks.service.impl.NotebookServiceImpl;
+import com.itcodebox.notebooks.service.impl.*;
 import com.itcodebox.notebooks.ui.notify.NotifyUtil;
-import com.itcodebox.notebooks.ui.toolsettings.AppSettingsChangedListener;
-import com.itcodebox.notebooks.ui.toolsettings.AppSettingsState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.itcodebox.notebooks.ui.toolsettings.*;
+import org.jetbrains.annotations.*;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-
 import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
 
 /**
@@ -332,37 +318,42 @@ public class ImportUtil {
      * @param title Notebook的标题
      * @return 用户的选择
      */
-    private static UserChoose nameConflictDialog(String title) {
+    private static UserChoose nameConflictDialog (String title) {
         UserChoose userChoose = new UserChoose();
-        Messages.showDialog(
-                "<html><body>" +
-                        message("notify.import.nameConflict.message1") + "<br>" +
-                        "<b>" + message("notify.import.nameConflict.message2") + "</b>" + title + "<br/>" +
-                        "</html></body>"
-                , message("notify.import.nameConflict.title"),
-                new String[]{
-                        //0
-                        message("notify.import.nameConflict.chooseOverwrite"),
-                        //1
-                        message("notify.import.nameConflict.chooseSkip"),
-                        //2
-                        message("notify.import.nameConflict.chooseUpdate"),
-                        //3
-                        message("notify.import.nameConflict.chooseAutoRename")
-                }, 1, Messages.getWarningIcon(), new DialogWrapper.DoNotAskOption.Adapter() {
-
-                    @Override
-                    public void rememberChoice(boolean isSelected, int exitCode) {
-                        userChoose.setDoNotAsk(isSelected);
-                        userChoose.setExitCode(exitCode);
-                    }
-
-                    @Override
-                    public @NotNull String getDoNotShowMessage() {
-                        return message("notify.import.nameConflict.rememberChoose");
-                    }
-                }
-        );
+        
+        String message = "<html><body>" +
+                message("notify.import.nameConflict.message1") + "<br>" +
+                "<b>" + message("notify.import.nameConflict.message2") + "</b>" + title + "<br/>" +
+                "</html></body>";
+        String msgTitle = message("notify.import.nameConflict.title");
+        String[] options = {
+                //0
+                message("notify.import.nameConflict.chooseOverwrite"),
+                //1
+                message("notify.import.nameConflict.chooseSkip"),
+                //2
+                message("notify.import.nameConflict.chooseUpdate"),
+                //3
+                message("notify.import.nameConflict.chooseAutoRename")
+        };
+        DoNotAskOption.Adapter adapter = new DoNotAskOption.Adapter()
+        {
+            
+            @Override
+            public void rememberChoice (boolean isSelected, int exitCode)
+            {
+                userChoose.setDoNotAsk(isSelected);
+                userChoose.setExitCode(exitCode);
+            }
+            
+            @Override
+            public @NotNull String getDoNotShowMessage ()
+            {
+                return message("notify.import.nameConflict.rememberChoose");
+            }
+        };
+        
+        MessagesService.getInstance().showMessageDialog(null, null, message, msgTitle, options, 1, -1, Messages.getWarningIcon(), adapter, false, null);
         return userChoose;
     }
 

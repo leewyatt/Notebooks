@@ -1,19 +1,14 @@
 package com.itcodebox.notebooks.action;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.ui.popup.*;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.BalloonImpl;
-import com.intellij.ui.popup.BalloonPopupBuilderImpl;
 import com.intellij.util.ui.JBUI;
 import com.itcodebox.notebooks.constant.PluginColors;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 
 /**
@@ -39,15 +34,17 @@ public class EditorInsertCodeAction extends DumbAwareAction {
                         && psiFile != null
         );
     }
-
+    
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-         Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
         Project project = e.getRequiredData(CommonDataKeys.PROJECT);
         InsertPanelFactory factory = new InsertPanelFactory();
         JPanel insertCodePanel = factory.createInsertPanel(project, editor);
-
-        BalloonImpl balloon = (BalloonImpl) new BalloonPopupBuilderImpl(null,insertCodePanel).setShadow(true)
+        
+        Balloon balloon = JBPopupFactory.getInstance()
+                .createDialogBalloonBuilder(insertCodePanel, null)
+                .setShadow(true)
                 .setDialogMode(true)
                 .setRequestFocus(true)
                 .setHideOnAction(true)
@@ -61,8 +58,21 @@ public class EditorInsertCodeAction extends DumbAwareAction {
                 .setBorderColor(PluginColors.INSERT_BALLOON_BORDER)
                 .setFillColor(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground())
                 .createBalloon();
-        balloon.setHideListener(balloon::hide);
-        factory.setBalloonImpl(balloon);
+        
+        balloon.addListener(new JBPopupListener() {
+            @Override
+            public void onClosed(@NotNull LightweightWindowEvent event) {
+                balloon.hide();
+            }
+        });
+        
+        factory.setBalloonImpl((BalloonImpl) balloon);
         balloon.show(JBPopupFactory.getInstance().guessBestPopupLocation(editor), Balloon.Position.atRight);
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread ()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

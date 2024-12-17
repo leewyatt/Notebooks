@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     // https://github.com/JetBrains/gradle-intellij-plugin
-    id 'org.jetbrains.intellij' version '1.15.0'
+    id 'org.jetbrains.intellij' version '1.17.4'
 }
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
@@ -43,7 +43,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    setVersion "2023.2.1"
+    setVersion "2024.2"
     setType "IC"
     setPluginName 'Notebook'
     setUpdateSinceUntilBuild false

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.39</version>
+    <version>1.40</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -76,7 +76,7 @@
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <!--    <idea-version since-build="203.8084.24"/>-->
-    <idea-version since-build="203.6682.168"/>
+    <idea-version since-build="222.3345.118"/>
 
     <resource-bundle>messages.NotebooksBundle</resource-bundle>
 

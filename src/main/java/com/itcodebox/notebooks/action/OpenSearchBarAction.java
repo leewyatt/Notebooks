@@ -1,26 +1,19 @@
 package com.itcodebox.notebooks.action;
 
-import com.intellij.ide.actions.ActivateToolWindowAction;
-import com.intellij.ide.actions.GotoActionBase;
+import com.intellij.ide.actions.*;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
 import com.intellij.navigation.ChooseByNameContributor;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.itcodebox.notebooks.entity.NoteNavigationItem;
-import com.itcodebox.notebooks.entity.SearchRecord;
+import com.intellij.openapi.wm.*;
+import com.itcodebox.notebooks.entity.*;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
 import com.itcodebox.notebooks.service.impl.NoteChooseByname;
 import com.itcodebox.notebooks.ui.model.NoteFilterModel;
 import com.itcodebox.notebooks.ui.panes.MainPanel;
-import com.itcodebox.notebooks.ui.tables.ChapterTable;
-import com.itcodebox.notebooks.ui.tables.NoteTable;
-import com.itcodebox.notebooks.ui.tables.NotebookTable;
+import com.itcodebox.notebooks.ui.tables.*;
 import com.itcodebox.notebooks.utils.FocusUtil;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 
 @SuppressWarnings("unchecked")
@@ -91,6 +84,12 @@ public class OpenSearchBarAction extends GotoActionBase {
         };
 
         showNavigationPopup(e, model, callback);
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread ()
+    {
+        return ActionUpdateThread.BGT;
     }
 
 }

@@ -2,10 +2,7 @@ package com.itcodebox.notebooks.ui.panes;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
@@ -661,6 +658,12 @@ public class DetailPanel extends JPanel {
                 e.getPresentation().setIcon(descScrollPane.isVisible() ? PluginIcons.Hide : PluginIcons.Show);
                 e.getPresentation().setText(descScrollPane.isVisible() ? message("detailPanel.action.showDesc.hide") : message("detailPanel.action.showDesc.show"));
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
         };
     }
 
@@ -671,6 +674,11 @@ public class DetailPanel extends JPanel {
             public void actionPerformed(@NotNull AnActionEvent e) {
                 northPanel.setVisible(!northPanel.isVisible());
                 e.getPresentation().setIcon(northPanel.isVisible() ? AllIcons.Actions.Collapseall : AllIcons.Actions.Expandall);
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -690,6 +698,11 @@ public class DetailPanel extends JPanel {
             public void update(@NotNull AnActionEvent e) {
                 Note selectedNote = noteTable.getSelectedObject();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getContent().isEmpty());
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -776,6 +789,12 @@ public class DetailPanel extends JPanel {
                 Note selectedNote = noteTable.getSelectedObject();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getSource().isEmpty());
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
 
         };
     }
@@ -805,6 +824,12 @@ public class DetailPanel extends JPanel {
                 Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getContent().isEmpty() && selectedTextEditor != null && selectedTextEditor.getDocument().isWritable());
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -814,7 +839,13 @@ public class DetailPanel extends JPanel {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getNotePanel().doAddNote();
             }
-
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
             @Override
             public void update(@NotNull AnActionEvent e) {
                 e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
@@ -891,6 +922,12 @@ public class DetailPanel extends JPanel {
 
                 return imageInfoChanged;
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -948,6 +985,12 @@ public class DetailPanel extends JPanel {
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
                 controlViewVisible(true, true, true);
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -962,6 +1005,12 @@ public class DetailPanel extends JPanel {
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
                 controlViewVisible(false, true, true);
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -976,6 +1025,13 @@ public class DetailPanel extends JPanel {
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
                 controlViewVisible(false, false, true);
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -990,6 +1046,13 @@ public class DetailPanel extends JPanel {
             public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
                 controlViewVisible(false, false, false);
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
