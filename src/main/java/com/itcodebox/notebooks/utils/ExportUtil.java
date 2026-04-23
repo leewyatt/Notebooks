@@ -2,6 +2,7 @@ package com.itcodebox.notebooks.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
@@ -36,6 +37,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class ExportUtil {
+    private static final Logger LOG = Logger.getInstance(ExportUtil.class);
     public static final int EXPORT_ALL = Integer.MIN_VALUE;
 
     /**
@@ -57,7 +59,7 @@ public class ExportUtil {
                             try {
                                 CustomFileUtil.copyDirectory(PluginConstant.IMAGE_DIRECTORY_PATH.toFile(), dirPath.resolve("notebook_" + fileTimeStr + ".assets").toFile());
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                LOG.warn("Failed to copy image directory during JSON export", e);
                             }
                             indicator.setText("Export data...");
                             //导出JSON
@@ -89,7 +91,7 @@ public class ExportUtil {
                                         message("notify.exportSucceed.json.title"),
                                         message("notify.exportSucceed.message") + "<a href='" + jsonUrl + "'>" + jsonUrl + "</a>");
                             } catch (MalformedURLException e) {
-                                e.printStackTrace();
+                                LOG.warn("Failed to build URL for exported JSON file", e);
                             }
 
                         }
@@ -120,7 +122,7 @@ public class ExportUtil {
                         List<String> imagePathList = NoteServiceImpl.getInstance().getImageRecordsByNotebookId(notebook.getId());
                         CustomFileUtil.exportImagesToDirectory(imagePathList, dirPath.resolve(assetsFileName).toFile());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOG.warn("Failed to export images during Markdown export", e);
                     }
                     indicator.setText("Export data...");
                     Path mdPath = dirPath.resolve(title + "_" + fileTimeStr + ".md");
@@ -156,7 +158,7 @@ public class ExportUtil {
                                 message("notify.exportSucceed.markdown.title"),
                                 message("notify.exportSucceed.message") + "<a href='" + mdUrl + "'>" + mdUrl + "</a>");
                     } catch (MalformedURLException e) {
-                        e.printStackTrace();
+                        LOG.warn("Failed to build URL for exported Markdown file", e);
                     }
                 }
             });
@@ -213,7 +215,7 @@ public class ExportUtil {
         try {
             return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(map);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to serialize all notebooks to JSON for export", e);
         }
         return "";
     }
@@ -239,7 +241,7 @@ public class ExportUtil {
         try {
             return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(map);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to serialize single notebook to JSON for export", e);
         }
         return "";
     }

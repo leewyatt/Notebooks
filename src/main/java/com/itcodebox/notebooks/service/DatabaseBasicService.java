@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.service;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
@@ -21,6 +22,7 @@ import java.util.List;
  * @author LeeWyatt
  */
 public class DatabaseBasicService {
+    private static final Logger LOG = Logger.getInstance(DatabaseBasicService.class);
     private  static final String DATABASE_DRIVER = "org.sqlite.JDBC";
     private  static final String DATABASE_URL = "jdbc:sqlite:" + PluginConstant.DB_FILE_PATH;
     private static final String EDITOR_OFFSET_START = "offset_start";
@@ -37,7 +39,7 @@ public class DatabaseBasicService {
             source.setDriverClassName(DATABASE_DRIVER);
             source.setUrl(DATABASE_URL);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to initialize SQLite data source", e);
         }
         // 如果不存在,创建DB文件
         createFileAndDir();
@@ -62,21 +64,21 @@ public class DatabaseBasicService {
             try {
                 rs.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close ResultSet", e);
             }
         }
         if (statement != null) {
             try {
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close Statement", e);
             }
         }
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close database Connection", e);
             }
         }
     }
@@ -90,7 +92,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.PROJECT_DB_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create plugin database directory", e);
             }
         }
         //"C:\Users\Administrator\.ideaNotebooksFile\notebooks.db"
@@ -98,7 +100,7 @@ public class DatabaseBasicService {
             try {
                 Files.createFile(PluginConstant.DB_FILE_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create SQLite database file", e);
             }
         }
         //创建图片文件夹.
@@ -106,7 +108,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.IMAGE_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create image directory", e);
             }
         }
 
@@ -115,7 +117,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.TEMP_IMAGE_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create temporary image directory", e);
             }
         }
     }
@@ -182,7 +184,7 @@ public class DatabaseBasicService {
                 queryRunner.update(addColImageRecords);
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to initialize SQLite tables", throwables);
         }
     }
 

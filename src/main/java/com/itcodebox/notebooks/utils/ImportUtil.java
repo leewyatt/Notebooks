@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.application.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
@@ -26,6 +27,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class ImportUtil {
+    private static final Logger LOG = Logger.getInstance(ImportUtil.class);
     private static final int CHOOSE_CLOSE = -1;
     private static final int CHOOSE_OVERWRITE = 0;
     private static final int CHOOSE_SKIP = 1;
@@ -45,7 +47,7 @@ public class ImportUtil {
                     try {
                         CustomFileUtil.copyDirectory(imageDirPath.toFile(),PluginConstant.IMAGE_DIRECTORY_PATH.toFile());
                     } catch (IOException exception) {
-                        exception.printStackTrace();
+                        LOG.warn("Failed to copy images during JSON import", exception);
                     }
                 }
                 //开启只读模式

@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.ui.tables;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.ListTableModel;
 import com.itcodebox.notebooks.entity.ImageRecord;
@@ -25,6 +26,7 @@ import java.awt.datatransfer.Transferable;
  * @author LeeWyatt
  */
 public class ImageTableMoveTransferHandler extends TransferHandler {
+    private static final Logger LOG = Logger.getInstance(ImageTableMoveTransferHandler.class);
     protected final DataFlavor localObjectFlavor;
     protected final ImageTable table;
     protected final Project project;
@@ -103,7 +105,7 @@ public class ImageTableMoveTransferHandler extends TransferHandler {
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to reorder image record via drag-and-drop", e);
             return false;
         }
 

@@ -7,6 +7,7 @@ package com.itcodebox.notebooks.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
  * @author Administrator
  */
 public class Notebook extends Record{
+    private static final Logger LOG = Logger.getInstance(Notebook.class);
 
     public Notebook() {
     }
@@ -34,7 +36,7 @@ public class Notebook extends Record{
         try {
             return new ObjectMapper().writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to serialize Notebook to JSON", e);
         }
         return "";
     }
@@ -50,7 +52,7 @@ public class Notebook extends Record{
             this.showOrder = notebook.getShowOrder();;
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to deserialize Notebook from JSON", e);
         }
     }
 

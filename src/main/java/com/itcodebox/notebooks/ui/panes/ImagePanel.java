@@ -2,6 +2,7 @@ package com.itcodebox.notebooks.ui.panes;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
@@ -48,6 +49,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class ImagePanel extends JPanel {
+    private static final Logger LOG = Logger.getInstance(ImagePanel.class);
     private Note note;
     private final Project project;
     private final JLabel imageLabel = new JLabel();
@@ -285,7 +287,7 @@ public class ImagePanel extends JPanel {
             try {
                 CustomFileUtil.deleteImagesAndThumb(imageRecord.getImagePath());
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOG.warn("Failed to delete image and thumbnail files", ioException);
             }
         });
         popupMenu.add(menuItemDelete);
@@ -300,7 +302,7 @@ public class ImagePanel extends JPanel {
         try {
             icon = new ImageIcon(PluginConstant.IMAGE_DIRECTORY_PATH.resolve(path).toUri().toURL());
         } catch (MalformedURLException malformedURLException) {
-            malformedURLException.printStackTrace();
+            LOG.warn("Failed to resolve image URL from path", malformedURLException);
         }
         return icon;
     }

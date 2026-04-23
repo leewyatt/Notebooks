@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.service.impl;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.dao.NotebookDao;
 import com.itcodebox.notebooks.dao.impl.NotebookDaoImpl;
 import com.itcodebox.notebooks.entity.Notebook;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author LeeWyatt
  */
 public class NotebookServiceImpl implements NotebookService {
+    private static final Logger LOG = Logger.getInstance(NotebookServiceImpl.class);
     private final DatabaseBasicService databaseBasicService = ApplicationManager.getApplication().getService(DatabaseBasicService.class);
     private final NotebookDao notebookDao = NotebookDaoImpl.getInstance();
 
@@ -32,7 +34,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             notebookDao.insert(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch insert notebooks", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -45,7 +47,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             return notebookDao.insert(conn, notebook);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to insert notebook", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -59,7 +61,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             notebookDao.delete(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete notebook by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -72,7 +74,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             notebookDao.update(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch update notebooks", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -85,7 +87,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             notebookDao.update(conn, notebook);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to update notebook", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -98,7 +100,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             return notebookDao.findById(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find notebook by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -112,7 +114,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             notebookDao.exchangeShowOrder(conn, showOrder1, showOrder2);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to exchange notebook show order", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -125,7 +127,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             return notebookDao.findByTitle(conn, title);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find notebook by title", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -139,7 +141,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             return notebookDao.findAll(conn);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find all notebooks", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -153,7 +155,7 @@ public class NotebookServiceImpl implements NotebookService {
             conn = databaseBasicService.getConnection();
             return notebookDao.getTitles(conn);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get notebook titles", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }

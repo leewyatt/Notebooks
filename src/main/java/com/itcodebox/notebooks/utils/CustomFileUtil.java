@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -29,6 +30,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class CustomFileUtil {
+    private static final Logger LOG = Logger.getInstance(CustomFileUtil.class);
 
     /**
      * 统计(缩略图)文件夹的大小 (不包含子目录, 因为缓存图片,都在同一目录下)
@@ -87,7 +89,7 @@ public class CustomFileUtil {
             try {
                 return Files.createDirectories(parentPath.resolve(dirName));
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOG.warn("Failed to create export directory", ioException);
             }
         }
         return null;
@@ -175,7 +177,7 @@ public class CustomFileUtil {
                     }
                     FileUtil.copy(fromFile, toFile);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    LOG.warn("Failed to copy image file to export directory", exception);
                 }
             }
         }
@@ -196,7 +198,7 @@ public class CustomFileUtil {
                 try {
                     deleteImagesAndThumb(imageRecord.getImagePath());
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    LOG.warn("Failed to delete image and thumbnail for record", exception);
                 }
             }
         }

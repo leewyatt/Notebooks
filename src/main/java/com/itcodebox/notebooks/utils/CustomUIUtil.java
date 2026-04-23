@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.util.ui.JBFont;
 import com.itcodebox.notebooks.constant.PluginConstant;
@@ -29,6 +30,8 @@ import java.time.format.DateTimeFormatter;
  * @author LeeWyatt
  */
 public class CustomUIUtil {
+    private static final Logger LOG = Logger.getInstance(CustomUIUtil.class);
+
     public static JBFont getMyDefaultFont() {
         return JBFont.create(new Font(Font.MONOSPACED, Font.PLAIN, 18));
     }
@@ -42,7 +45,7 @@ public class CustomUIUtil {
         try {
             imgSrc = resource.toURI().toString();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to convert resource URL to URI", e);
         }
         return imgSrc;
     }
@@ -105,7 +108,7 @@ public class CustomUIUtil {
                 return (Image) t.getTransferData(DataFlavor.imageFlavor);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to read image from clipboard", e);
         }
 
         return null;

@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.service.impl;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.dao.ChapterDao;
 import com.itcodebox.notebooks.dao.impl.ChapterDaoImpl;
 import com.itcodebox.notebooks.entity.Chapter;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author LeeWyatt
  */
 public class ChapterServiceImpl implements ChapterService {
+    private static final Logger LOG = Logger.getInstance(ChapterServiceImpl.class);
     private final DatabaseBasicService databaseBasicService = ApplicationManager.getApplication().getService(DatabaseBasicService.class);
     private final ChapterDao chapterDao = ChapterDaoImpl.getInstance();
 
@@ -33,7 +35,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             return chapterDao.findAllByNotebookId(conn, notebookId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find all chapters by notebook id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -47,7 +49,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.deleteAllByNotebookId(conn, notebookId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete all chapters by notebook id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -60,7 +62,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             return chapterDao.findByTitle(conn, title, notebookId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find chapter by title", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -74,7 +76,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             return chapterDao.getTitles(conn, notebookTitle);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get chapter titles for notebook", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -88,7 +90,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.insert(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch insert chapters", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -101,7 +103,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             return chapterDao.insert(conn, chapter);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to insert chapter", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -115,7 +117,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.delete(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete chapter by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -128,7 +130,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.update(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch update chapters", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -141,7 +143,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.update(conn, chapter);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to update chapter", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -154,7 +156,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             return chapterDao.findById(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find chapter by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -168,7 +170,7 @@ public class ChapterServiceImpl implements ChapterService {
             conn = databaseBasicService.getConnection();
             chapterDao.exchangeShowOrder(conn, showOrder1, showOrder2);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to exchange chapter show order", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }

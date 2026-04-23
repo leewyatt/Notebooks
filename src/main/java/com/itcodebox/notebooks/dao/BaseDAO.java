@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.dao;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.dbutils.*;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public abstract class BaseDAO<T> {
+    private static final Logger LOG = Logger.getInstance(BaseDAO.class);
     private Class<T> clazz;
     protected QueryRunner queryRunner = new QueryRunner();
 
@@ -41,7 +43,7 @@ public abstract class BaseDAO<T> {
         try {
             result = queryRunner.query(conn, sql, handler,args);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute scalar SQL query", e);
         }
         return result;
     }
@@ -58,7 +60,7 @@ public abstract class BaseDAO<T> {
         try {
             list = queryRunner.query(conn, sql, handler, objs);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute bean list SQL query", e);
         }
         return list;
     }
@@ -70,7 +72,7 @@ public abstract class BaseDAO<T> {
         try {
             list = queryRunner.query(conn, sql, handler,objs);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to query title column list", e);
         }
         return list;
     }
@@ -82,7 +84,7 @@ public abstract class BaseDAO<T> {
         try {
             list = queryRunner.query(conn, sql, handler,objs);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to query image_records column list", e);
         }
         return list;
     }
@@ -97,7 +99,7 @@ public abstract class BaseDAO<T> {
             RowProcessor processor = new BasicRowProcessor(bean);
             t = queryRunner.query(conn,sql,new BeanHandler<T>(clazz,processor),objs);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute single bean SQL query", e);
         }
         return t;
     }
@@ -108,7 +110,7 @@ public abstract class BaseDAO<T> {
         try {
             count = queryRunner.update(conn, sql, args);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute SQL update", e);
         }
         return count;
     }
@@ -118,7 +120,7 @@ public abstract class BaseDAO<T> {
         try {
             queryRunner.batch(conn, sql, args);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to execute SQL batch update", throwables);
         }
     }
 }
