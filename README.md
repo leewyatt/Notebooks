@@ -1,12 +1,16 @@
 # Notebook
 
-> A three-level note-taking plugin for IntelliJ-based IDEs. Select code in the editor, right-click, save it alongside your project — never copy-paste a snippet into Slack again.
->
-> 中文文档：[README.zh-CN.md](./README.zh-CN.md)
+[![Version](https://img.shields.io/jetbrains/plugin/v/com.itcodebox.leewyatt.notebooks.id?label=version)](https://plugins.jetbrains.com/plugin/16998-notebook)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.itcodebox.leewyatt.notebooks.id)](https://plugins.jetbrains.com/plugin/16998-notebook)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-**Marketplace ID:** `com.itcodebox.leewyatt.notebooks.id`
-**Current version:** 1.41
-**Supported IDEs:** IntelliJ IDEA 2023.3+ (Community & Ultimate); most other IntelliJ Platform IDEs
+Code-aware, local-first note-taking for IntelliJ-based IDEs. Capture snippets while you code, organize them in a three-level hierarchy (`Notebook` > `Chapter` > `Note`), and keep everything in a single SQLite file on your own machine — **no cloud, no account, no telemetry**.
+
+Works with both **Community** and **Ultimate** editions. Requires IntelliJ IDEA **2023.3+** and Java **17+**.
+
+<a href="https://plugins.jetbrains.com/plugin/16998-notebook"><img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F_Install_from-JetBrains_Marketplace-orange?style=for-the-badge&logo=jetbrains" alt="Install from JetBrains Marketplace"></a>
+
+中文文档：[README.zh-CN.md](./README.zh-CN.md)
 
 ---
 

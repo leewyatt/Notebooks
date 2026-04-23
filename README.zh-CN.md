@@ -1,12 +1,16 @@
 # Notebook（笔记）
 
-> IntelliJ 系 IDE 内置的三级笔记插件。在编辑器里选中代码右键收藏，让那些"早晚要用到的片段"留在 IDE 里，而不是散落在 Slack、浏览器标签页和 `TODO.txt` 中。
->
-> English: [README.md](./README.md)
+[![Version](https://img.shields.io/jetbrains/plugin/v/com.itcodebox.leewyatt.notebooks.id?label=version)](https://plugins.jetbrains.com/plugin/16998-notebook)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.itcodebox.leewyatt.notebooks.id)](https://plugins.jetbrains.com/plugin/16998-notebook)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-**Marketplace ID:** `com.itcodebox.leewyatt.notebooks.id`
-**当前版本:** 1.41
-**支持的 IDE:** IntelliJ IDEA 2023.3 及以上（Community & Ultimate）；其他 IntelliJ 系 IDE 基本也可用
+IntelliJ 系 IDE 内置的**代码感知、本地优先**笔记插件。随手从编辑器收藏代码片段，用三级目录（`笔记本` > `章节` > `笔记`）组织，所有数据落在本机单个 SQLite 文件里 —— **无云端、无账号、无遥测**。
+
+支持 IntelliJ IDEA **2023.3+**（Community & Ultimate 均可）+ Java **17+**。
+
+<a href="https://plugins.jetbrains.com/plugin/16998-notebook"><img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F_%E4%BB%8E-JetBrains_Marketplace_%E5%AE%89%E8%A3%85-orange?style=for-the-badge&logo=jetbrains" alt="从 JetBrains Marketplace 安装"></a>
+
+English: [README.md](./README.md)
 
 ---
 
