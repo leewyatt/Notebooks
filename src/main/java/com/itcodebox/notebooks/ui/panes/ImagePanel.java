@@ -38,6 +38,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,39 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  */
 public class ImagePanel extends JPanel {
     private static final Logger LOG = Logger.getInstance(ImagePanel.class);
+
+    /**
+     * LRU thumbnail cache, sized to cover active browsing without growing
+     * unbounded. Previously every row selection called {@code new ImageIcon(path)}
+     * which hits the disk synchronously on the EDT — noticeable lag on slow
+     * disks or when quickly arrow-keying through a long image list.
+     *
+     * <p>Key format: {@code absolutePath + "?" + lastModifiedMs}. Including the
+     * mtime means the cache auto-invalidates when a thumbnail on disk changes,
+     * so no explicit eviction is needed when an image is replaced.
+     */
+    private static final int THUMB_CACHE_MAX = 200;
+    private static final Map<String, ImageIcon> THUMB_CACHE = Collections.synchronizedMap(
+            new LinkedHashMap<>(THUMB_CACHE_MAX, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, ImageIcon> eldest) {
+                    return size() > THUMB_CACHE_MAX;
+                }
+            });
+
+    private static ImageIcon loadThumbnailCached(File thumbFile) {
+        if (thumbFile == null || !thumbFile.isFile()) {
+            return new ImageIcon();
+        }
+        String key = thumbFile.getAbsolutePath() + "?" + thumbFile.lastModified();
+        ImageIcon cached = THUMB_CACHE.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        ImageIcon fresh = new ImageIcon(thumbFile.getAbsolutePath());
+        THUMB_CACHE.put(key, fresh);
+        return fresh;
+    }
     private Note note;
     private final Project project;
     private final JLabel imageLabel = new JLabel();
@@ -208,7 +244,7 @@ public class ImagePanel extends JPanel {
                 return;
             }
             File thumbFile = CustomUIUtil.getThumbFile(imageRecord.getImagePath());
-            ImageIcon icon = new ImageIcon(thumbFile.getAbsolutePath());
+            ImageIcon icon = loadThumbnailCached(thumbFile);
 
             int width = icon.getIconWidth();
             int height = icon.getIconHeight();
