@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.40</version>
+    <version>1.41</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -66,12 +66,29 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <ul>
-          <li>Add shortcut keys to the search action (default: Alt + S).</li>
-          <li>Adjusted the search dialog's UI.</li>
-          <li>给搜索功能添加快捷键(默认: ALT + S).</li>
-          <li>调整了搜索界面.</li>
-        </ul>
+<h3>1.41</h3>
+<ul>
+  <li><b>Automatic database backup on upgrade</b> — the first launch after installing a new plugin version copies <code>notebooks.db</code> to <code>~/.ideaNotebooksFile/backups/</code> before any schema migration. Last 5 backups retained.</li>
+  <li><b>Export as Markdown Tree</b> — new gear menu item exports every notebook/chapter/note into a portable folder tree (one <code>.md</code> per note, with YAML frontmatter and <code>_assets/</code> images). Friendly for migrating to Obsidian / Typora.</li>
+  <li>Compatibility: IntelliJ Platform Gradle Plugin v2, Gradle 8.14, updated SQLite (3.46), commons-dbcp2 (2.12), targets IDE 2023.3+ through current.</li>
+  <li>New UI: 20&times;20 tool window strip icon variant added.</li>
+  <li>Internal: printStackTrace replaced with <code>Logger</code> across 23 files — real errors now land in <code>idea.log</code> for bug reports.</li>
+</ul>
+<h3>1.41 (zh)</h3>
+<ul>
+  <li><b>升级自动备份</b> — 每次安装新版本后首次启动，自动把 <code>notebooks.db</code> 备份到 <code>~/.ideaNotebooksFile/backups/</code>，保留最近 5 份。</li>
+  <li><b>导出为 Markdown 文件树</b> — 齿轮菜单新增一项，把全部笔记导出为目录树（每条笔记一个 <code>.md</code>，含 YAML 头和 <code>_assets/</code> 图片），方便迁移到 Obsidian/Typora。</li>
+  <li>兼容性：升级到 IntelliJ Platform Gradle Plugin v2、Gradle 8.14、SQLite 3.46、commons-dbcp2 2.12；支持 IDE 2023.3 及以上。</li>
+  <li>新版 UI：补充 20&times;20 工具窗口条形图标。</li>
+  <li>内部：23 个文件的 <code>printStackTrace</code> 替换为 <code>Logger</code>，错误现在会写入 <code>idea.log</code>，方便反馈。</li>
+</ul>
+<h3>1.40</h3>
+<ul>
+  <li>Add shortcut keys to the search action (default: Alt + S).</li>
+  <li>Adjusted the search dialog's UI.</li>
+  <li>给搜索功能添加快捷键(默认: ALT + S).</li>
+  <li>调整了搜索界面.</li>
+</ul>
     ]]></change-notes>
 
     <!-- since-build is now controlled by build.gradle.kts patchPluginXml.sinceBuild.
@@ -103,18 +120,29 @@
             public class StartUpWork implements StartupActivity
             -->
         <postStartupActivity implementation="com.itcodebox.notebooks.projectservice.StartUpWork" id="postStartupActivity"/>
-        <!--   APP级别的数据库相关的服务     -->
+        <!-- Service classes are still registered here (not @Service annotated) because
+             NoteChooseByname extends SearchRecordServiceImpl — @Service requires the
+             class be final, so we can't annotate the parent without also refactoring
+             the inheritance. Annotation migration deferred to L1 / v1.42. -->
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.DatabaseBasicService"/>
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.NotebookServiceImpl"/>
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.ChapterServiceImpl"/>
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.NoteServiceImpl"/>
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.service.impl.SearchRecordServiceImpl"/>
         <!--   APP级别的持久化(主要是全局设置)     -->
+        <!--suppress PluginXmlValidity -->
         <applicationService serviceImplementation="com.itcodebox.notebooks.ui.toolsettings.AppSettingsState"/>
 
         <!--   项目级服务: 界面的显示以及与其他项目界面的通信  -->
+        <!--suppress PluginXmlValidity -->
         <projectService serviceImplementation="com.itcodebox.notebooks.projectservice.NotebooksUIManager"/>
         <!--   项目级别的持久化(选择的item,Pane的显示与隐藏 等状态的持久化)     -->
+        <!--suppress PluginXmlValidity -->
         <projectService serviceImplementation="com.itcodebox.notebooks.projectservice.ProjectStorage"/>
 
         <toolWindow factoryClass="com.itcodebox.notebooks.ui.NoteWindowFactory"
@@ -132,6 +160,7 @@
         <!--                                implementation="com.itcodebox.notebooks.ui.widget.SelectionRangeWidgetFactory"-->
         <!--                                order="before memoryUsageWidget"/>-->
 	    
+        <!--suppress PluginXmlValidity -->
         <projectService serviceImplementation="com.itcodebox.notebooks.projectservice.NoteChooseByNameFilterCondiguration"/>
     </extensions>
 
@@ -158,13 +187,13 @@
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut first-keystroke="alt s" keymap="$default"/>
         </action>
-	    <action id="ActivateNotebookToolWindow" class="com.itcodebox.notebooks.action.ActivateNotebookAction"
-	            text="ActivateNotebook">
-		    <add-to-group group-id="WindowMenu" anchor="first"/>
-		    <keyboard-shortcut keymap="$default" first-keystroke="alt O"/>
-	    </action>
-        <action id="OpenNotebookSearchBarAction" class="com.itcodebox.notebooks.action.OpenSearchBarAction"
-                text="NotebookSearchBar">
+        <!-- text / description are resolved from NotebooksBundle via
+             action.<id>.text / action.<id>.description keys. -->
+        <action id="ActivateNotebookToolWindow" class="com.itcodebox.notebooks.action.ActivateNotebookAction">
+            <add-to-group group-id="WindowMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt O"/>
+        </action>
+        <action id="OpenNotebookSearchBarAction" class="com.itcodebox.notebooks.action.OpenSearchBarAction">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift alt S"/>
         </action>
