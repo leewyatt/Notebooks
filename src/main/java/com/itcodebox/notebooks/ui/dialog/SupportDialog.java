@@ -25,9 +25,9 @@ public class SupportDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         VerticalBox box = new VerticalBox();
-        box.add(new JLabel("使用支付宝/微信支付打赏后请留言提供您的名字/昵称"));
-        box.add(new JLabel("您提供的名字/昵称以及打赏总额将会被记录,用于展示在打赏列表里(例如QQ群)。"));
-        box.add(new JLabel("感谢您的慷慨打赏！"));
+        box.add(new JLabel(message("supportDialog.label.line1")));
+        box.add(new JLabel(message("supportDialog.label.line2")));
+        box.add(new JLabel(message("supportDialog.label.line3")));
         box.add(new JBLabel(PluginIcons.Donate));
         return box;
     }

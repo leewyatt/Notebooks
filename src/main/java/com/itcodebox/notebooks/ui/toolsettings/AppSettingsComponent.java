@@ -227,11 +227,11 @@ public class AppSettingsComponent {
 
         LinkLabel<Object> contactLabel = new LinkLabel<Object>(message("settingPanel.link.contact.text"), PluginIcons.Email);
         contactLabel.setListener((aSource, aLinkData) -> {
-            String content =
-                    "QQ 群号: <a  target='_blank' href='#qq_group'><b>" + PluginConstant.QQ_GROUP + "</b></a>(点击复制群号)<br/>" +
-                            "Github:<a href='#github'><b>" + PluginConstant.URL_GITHUB + "</b></a>(点击访问)<br/>" +
-                            "163：<a href='#mail-163'><b>" + PluginConstant.EMAIL_163 + "</b></a> (点击发送邮件)<br/>" +
-                            "GMail：<a href='#mail-g'><b>" + PluginConstant.EMAIL_GMAIL + "</b></a> (点击发送邮件)<br/>";
+            String content = message("appSettings.contact.html",
+                    PluginConstant.QQ_GROUP,
+                    PluginConstant.URL_GITHUB,
+                    PluginConstant.EMAIL_163,
+                    PluginConstant.EMAIL_GMAIL);
             JBPopupFactory.getInstance()
                     .createHtmlTextBalloonBuilder(content, null, new JBColor(0xE4E6EB, 0x45494B), new HyperlinkListener() {
                         @Override

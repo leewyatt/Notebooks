@@ -730,7 +730,10 @@ public class DetailPanel extends JPanel {
     }
 
     private DumbAwareAction initCollapseAction() {
-        return new DumbAwareAction("Collapse or Expand", "", AllIcons.Actions.Collapseall) {
+        return new DumbAwareAction(
+                message("detailPanel.action.collapseExpand.text"),
+                message("detailPanel.action.collapseExpand.description"),
+                AllIcons.Actions.Collapseall) {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {

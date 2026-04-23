@@ -9,6 +9,8 @@ import com.itcodebox.notebooks.ui.toolsettings.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -27,7 +29,9 @@ public class TipForUsingDialog extends DialogWrapper {
             //联系方式
             new Tip("Contact",
                     new String[]{
-                            "提交Bug和建议 或 交流JavaFX Swing的开发,请加QQ群: <b>715598051</b>",
+                            // locale-specific: zh version keeps QQ group + GitHub;
+                            // en version shows GitHub only (QQ isn't practical for non-Chinese users).
+                            message("tipsDialog.tip.contact"),
                             "Email: <b>" + PluginConstant.EMAIL_GMAIL + "</b>",
                             "Github: <b>" + PluginConstant.URL_GITHUB + "</b>",
                     },

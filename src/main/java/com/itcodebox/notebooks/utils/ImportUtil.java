@@ -38,7 +38,7 @@ public class ImportUtil {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, message("notify.import.backgroundTask.title"), true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setText("Import images");
+                indicator.setText(message("notify.import.progress.images"));
                 //第一步复制图片
                 String fileName = selectedFile.getName();
                 String imageDir = fileName.substring(0, fileName.lastIndexOf(".")) + ".assets";

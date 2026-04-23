@@ -50,10 +50,10 @@ public class ExportUtil {
         if (file.exists() && file.isDirectory()) {
             //导出JSON,设置为不可取消
             ProgressManager.getInstance().run(
-                    new Task.Backgroundable(project, "Export JSON and Image Files", true) {
+                    new Task.Backgroundable(project, message("notify.export.jsonTask.title"), true) {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
-                            indicator.setText("Export images...");
+                            indicator.setText(message("notify.export.progress.images"));
                             //导出图片
                             try {
                                 CustomFileUtil.copyDirectory(PluginConstant.IMAGE_DIRECTORY_PATH.toFile(), dirPath.resolve("notebook_" + fileTimeStr + ".assets").toFile());
@@ -61,7 +61,7 @@ public class ExportUtil {
                                 LOG.warn("Failed to copy image directory during JSON export", e);
                             }
                             indicator.checkCanceled();
-                            indicator.setText("Export data...");
+                            indicator.setText(message("notify.export.progress.data"));
                             //导出JSON
                             Path jsonPath = dirPath.resolve("notebook_" + fileTimeStr + ".json");
                             try (FileOutputStream os = new FileOutputStream(jsonPath.toFile())) {
@@ -108,10 +108,10 @@ public class ExportUtil {
     public static void exportMarkdownFile(Project project, Path dirPath, Notebook notebook, String fileTimeStr) {
         File file = dirPath.toFile();
         if (file.exists() && file.isDirectory()) {
-            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export markdown file", true) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, message("notify.export.markdownTask.title"), true) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
-                    indicator.setText("Export images...");
+                    indicator.setText(message("notify.export.progress.images"));
                     String title = file.getName();
                     //1.导出图片
                     String assetsFileName = title + "_" + fileTimeStr + ".assets";
@@ -122,7 +122,7 @@ public class ExportUtil {
                     } catch (IOException e) {
                         LOG.warn("Failed to export images during Markdown export", e);
                     }
-                    indicator.setText("Export data...");
+                    indicator.setText(message("notify.export.progress.data"));
                     Path mdPath = dirPath.resolve(title + "_" + fileTimeStr + ".md");
                     try (FileOutputStream os = new FileOutputStream(mdPath.toFile())) {
                         //关于字符集, SQLite默认UTF-8 防止乱码...
@@ -192,7 +192,7 @@ public class ExportUtil {
                     message("notify.exportError.message"));
             return;
         }
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export Markdown tree", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, message("notify.export.markdownTreeTask.title"), true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
@@ -205,7 +205,7 @@ public class ExportUtil {
                 int noteCount = 0;
                 for (Notebook notebook : notebooks) {
                     indicator.checkCanceled();
-                    indicator.setText("Exporting " + notebook.getTitle());
+                    indicator.setText(message("notify.export.progress.exportingNotebook", notebook.getTitle()));
                     File notebookDir = dirPath.resolve(sanitizeFilename(notebook.getTitle())).toFile();
                     if (!notebookDir.exists() && !notebookDir.mkdirs()) {
                         LOG.warn("Failed to create notebook directory: " + notebookDir);
