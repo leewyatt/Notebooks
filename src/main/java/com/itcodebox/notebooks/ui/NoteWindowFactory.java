@@ -20,6 +20,7 @@ import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.itcodebox.notebooks.constant.PluginConstant;
+import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
 import com.itcodebox.notebooks.projectservice.RecordListener;
 import com.itcodebox.notebooks.ui.dialog.ClearCacheDialog;
@@ -75,6 +76,7 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
         DefaultActionGroup gearActions = new DefaultActionGroup();
         gearActions.add(initActionExportJson());
         gearActions.add(initActionImportJson());
+        gearActions.add(initActionExportMarkdownSingle());
         gearActions.add(initActionExportMarkdownTree());
         gearActions.add(new Separator());
         gearActions.add(initActionClearCache());
@@ -165,6 +167,65 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread ()
             {
+                return ActionUpdateThread.BGT;
+            }
+        };
+    }
+
+    /**
+     * Export the currently-selected notebook as a single Markdown file
+     * (via the user-customizable Groovy template). Same backing export as
+     * the notebook right-click menu "Export Markdown" — surfaced in the
+     * gear menu so users don't have to discover the right-click path.
+     *
+     * <p>Scope = <i>selected notebook</i>. If nothing is selected, shows an
+     * info dialog and does nothing. Tree-mode export (one .md per note)
+     * remains a separate gear-menu entry for Obsidian-style workflows.
+     */
+    private DumbAwareAction initActionExportMarkdownSingle() {
+        return new DumbAwareAction(
+                message("mainPanel.action.exportMarkdownSingle.text"),
+                message("mainPanel.action.exportMarkdownSingle.description"),
+                PluginIcons.MarkdownFile) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                // Refresh in case another open project edited notebooks concurrently.
+                ApplicationManager.getApplication().getMessageBus().syncPublisher(RecordListener.TOPIC)
+                        .onRefresh();
+                if (mainPanel.getNotebookTable().getRowCount() < 1) {
+                    Messages.showMessageDialog(
+                            project,
+                            message("mainPanel.action.exportJson.empty.message"),
+                            message("mainPanel.action.exportJson.empty.title"),
+                            Messages.getInformationIcon());
+                    return;
+                }
+                Notebook selected = mainPanel.getNotebookTable().getSelectedObject();
+                if (selected == null) {
+                    Messages.showMessageDialog(
+                            project,
+                            message("mainPanel.action.exportMarkdownSingle.noSelection.message"),
+                            message("mainPanel.action.exportMarkdownSingle.noSelection.title"),
+                            Messages.getInformationIcon());
+                    return;
+                }
+                DateTimeFormatter fileTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                String fileTimeStr = fileTimeFormatter.format(LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(System.currentTimeMillis()), ZoneId.systemDefault()));
+                String defaultDirName = selected.getTitle() == null ? "Notebook_Markdown" : selected.getTitle();
+                Path path = CustomFileUtil.choosePath(project, defaultDirName);
+                if (path != null) {
+                    ExportUtil.exportMarkdownFile(project, path, selected, fileTimeStr);
+                }
+            }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
             }
         };
