@@ -44,7 +44,14 @@ dependencies {
     // DatabaseBasicService.
     implementation("org.apache.commons:commons-dbcp2:2.9.0")
     implementation("commons-dbutils:commons-dbutils:1.8.1")
-    implementation("org.xerial:sqlite-jdbc:3.46.1.0")
+    // sqlite-jdbc pinned to 3.39.2.0 — last release that uses java.util.logging.
+    // 3.39.3.0 (Sept 2022) switched to SLF4J, and at runtime inside IntelliJ the
+    // plugin classloader sees a different org.slf4j.ILoggerFactory class than
+    // the one StaticLoggerBinder was loaded against → LinkageError during
+    // org.sqlite.JDBC.<clinit>. Same mechanism as the dbcp2/commons-logging
+    // downgrade above. 3.39.2.0 still has Apple Silicon native binaries and
+    // modern sqlite engine (3.39.2), just without SLF4J.
+    implementation("org.xerial:sqlite-jdbc:3.39.2.0")
 
     // Swing drag-and-drop handlers use javax.activation.{DataHandler, ActivationDataFlavor}
     // (4 TransferHandler classes). Jakarta migration deferred to L1.

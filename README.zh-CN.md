@@ -90,9 +90,12 @@
 需要 JDK 21（推荐 JBR 21，已在 `gradle.properties` 的 `org.gradle.java.home` 钉住）。
 
 ```bash
-./gradlew build            # 编译 + 打包
-./gradlew runIde           # 启动一个 sandbox IDE，已装本插件
-./gradlew verifyPlugin     # 跑 JetBrains Plugin Verifier 多版本兼容检查
+# 编译 + 打包
+./gradlew build            
+# 启动一个 sandbox IDE，已装本插件
+./gradlew runIde 
+ # 跑 JetBrains Plugin Verifier 多版本兼容检查          
+./gradlew verifyPlugin    
 ```
 
 构建产物在 `build/distributions/`。
