@@ -3,6 +3,7 @@ package com.itcodebox.notebooks.projectservice;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.itcodebox.notebooks.entity.LayoutMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,9 +18,25 @@ import org.jetbrains.annotations.Nullable;
 )
 public class ProjectStorage implements PersistentStateComponent<ProjectStorage> {
 
+    /**
+     * Legacy fields (plugin &lt; 1.42). Kept so XML saved by older versions
+     * still deserializes; {@link #loadState} migrates them into
+     * {@link #layoutMode} on first load after upgrade. New writes only touch
+     * {@code layoutMode}. Defaults match the original (all-false = legacy
+     * "content only" first-run layout).
+     */
     public boolean notebookPaneVisible = false;
     public boolean chapterPaneVisible = false;
     public boolean notePaneVisible = false;
+
+    /**
+     * Which top-level panels are visible in the tool window. Source of truth
+     * from 1.42 onwards. Persisted as enum name via XmlSerializer. Defaults
+     * to {@link LayoutMode#FULL} — new installs see the full four-column view
+     * so they can discover the notebook/chapter/note hierarchy without
+     * needing to hunt for a "show everything" toggle.
+     */
+    public LayoutMode layoutMode = LayoutMode.FULL;
 
     public int selectedNotebookId = -1;
     public int selectedChapterId = -1;
@@ -47,11 +64,29 @@ public class ProjectStorage implements PersistentStateComponent<ProjectStorage> 
     @Override
     public @Nullable
     ProjectStorage getState() {
+        // Keep legacy booleans in sync with layoutMode so a downgrade to a
+        // plugin version < 1.42 can still read meaningful visibility state
+        // from the XML (layoutMode will be ignored by older code).
+        notebookPaneVisible = layoutMode.isNotebookVisible();
+        chapterPaneVisible = layoutMode.isChapterVisible();
+        notePaneVisible = layoutMode.isNoteVisible();
         return this;
     }
 
     @Override
     public void loadState(@NotNull ProjectStorage projectStorage) {
         XmlSerializerUtil.copyBean(projectStorage, this);
+        // Upgrading from < 1.42: the XML has per-panel visibility booleans but
+        // no layoutMode. If XmlSerializer left layoutMode at its Java default
+        // (FULL) while any of the legacy booleans are non-default, assume the
+        // user had customized visibility and recover that mode. After this
+        // one-time migration the booleans are ignored on read (getState still
+        // serializes them, but they're orthogonal to layoutMode going forward).
+        boolean anyLegacyVisible = notebookPaneVisible || chapterPaneVisible || notePaneVisible;
+        if (this.layoutMode == LayoutMode.FULL && anyLegacyVisible
+                && !(notebookPaneVisible && chapterPaneVisible && notePaneVisible)) {
+            this.layoutMode = LayoutMode.fromLegacyVisibility(
+                    notebookPaneVisible, chapterPaneVisible, notePaneVisible);
+        }
     }
 }

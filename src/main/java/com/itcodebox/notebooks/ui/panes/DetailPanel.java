@@ -11,7 +11,6 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.JBMenuItem;
@@ -28,6 +27,7 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.openapi.wm.impl.welcomeScreen.BottomLineBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.*;
 import com.intellij.ui.components.panels.HorizontalBox;
@@ -38,6 +38,7 @@ import com.itcodebox.notebooks.constant.PluginColors;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.entity.Chapter;
 import com.itcodebox.notebooks.entity.ImageRecord;
+import com.itcodebox.notebooks.entity.LayoutMode;
 import com.itcodebox.notebooks.entity.Note;
 import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
@@ -331,7 +332,7 @@ public class DetailPanel extends JPanel {
         navPanel.add(boxWest, BorderLayout.WEST);
 
         JPanel box = new JPanel(new GridLayout(4, 1));
-        box.add(getVisiblePanelToolbar(box));
+        box.add(buildLayoutComboBox());
         box.add(comboBoxNotebook);
         box.add(comboBoxChapter);
         box.add(comboBoxNote);
@@ -651,18 +652,41 @@ public class DetailPanel extends JPanel {
 
     }
 
-    private JComponent getVisiblePanelToolbar(JComponent target) {
-        ActionManager actionManager = ActionManager.getInstance();
-        DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP_VISIBLE_PANEL", false);
-        actionGroup.addSeparator();
-        actionGroup.add(initNotebookVisibleAction());
-        actionGroup.add(initChapterVisibleAction());
-        actionGroup.add(initNoteVisibleAction());
-        actionGroup.add(initDetailVisibleAction());
+    /**
+     * Build the layout-mode ComboBox that replaced the old four-icon toggle
+     * row. The icons gave no affordance of being clickable and their
+     * {@code isSelected()} semantics showed three of four as "on" in FULL mode
+     * — misleading users into treating radio-style modes as independent
+     * toggles. A ComboBox with icon+label rendering removes that ambiguity.
+     */
+    private JComponent buildLayoutComboBox() {
+        ComboBox<LayoutMode> combo = new ComboBox<>(LayoutMode.values());
+        combo.setRenderer(SimpleListCellRenderer.create((label, mode, index) -> {
+            if (mode != null) {
+                label.setIcon(mode.getIcon());
+                label.setText(message(mode.getBundleKey()));
+            }
+        }));
+        combo.setSelectedItem(projectStorage.layoutMode);
+        combo.setToolTipText(message("mainPanel.layout.label"));
+        combo.addActionListener(e -> {
+            LayoutMode picked = (LayoutMode) combo.getSelectedItem();
+            if (picked != null && picked != projectStorage.layoutMode) {
+                applyLayoutMode(picked);
+            }
+        });
+        return combo;
+    }
 
-        ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_GROUP_VISIBLE_PANEL", actionGroup, true);
-        actionToolbar.setTargetComponent(target);
-        return actionToolbar.getComponent();
+    /**
+     * Apply a layout mode: update panel visibility, persist to
+     * {@link ProjectStorage}, and delegate to {@link #controlViewVisible}
+     * so the tool-window width recomputation path is identical to the old
+     * toggle-button behavior.
+     */
+    private void applyLayoutMode(LayoutMode mode) {
+        projectStorage.layoutMode = mode;
+        controlViewVisible(mode.isNotebookVisible(), mode.isChapterVisible(), mode.isNoteVisible());
     }
 
     private JComponent getNoteToolbar(JComponent target) {
@@ -988,11 +1012,13 @@ public class DetailPanel extends JPanel {
     }
 
     private int computeWidth(int oldSize, int newSize, int oldWidth) {
-        boolean b1 = getMainPanel().getNotebookPanel().isVisible();
-        boolean b2 = getMainPanel().getChapterPanel().isVisible();
-        getMainPanel().getLeftPane().setProportion(0.5f);
-        getMainPanel().getRightPane().setProportion(0.5f);
-        getMainPanel().getContentPane().setProportion(!b1 && b2 ? 0.333333333f : 0.5f);
+        // Previously this method also forcibly reset the three splitter
+        // proportions to 0.5 / 0.5 / (0.33 or 0.5) on every layout-mode switch.
+        // With the persist-on-drag behavior added for GitHub #8, that reset
+        // undid the user's own drag adjustments whenever they switched modes.
+        // MainPanel now owns splitter proportions (loaded from ProjectStorage),
+        // so we only compute the target tool-window width here and leave
+        // proportions alone.
         return (int) (oldWidth * 1.0 / oldSize * newSize);
     }
 
@@ -1007,91 +1033,11 @@ public class DetailPanel extends JPanel {
         getNotePanel().setVisible(notePanelVisible);
         int newSize = getPanelSize();
         setToolWindowWidth(oldSize, newSize);
-        projectStorage.notebookPaneVisible = notebookPanelVisible;
-        projectStorage.chapterPaneVisible = chapterPanelVisible;
-        projectStorage.notePaneVisible = notePanelVisible;
-    }
-
-    private DumbAwareToggleAction initNotebookVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showNotebook.text"), "", PluginIcons.NotebookCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getNotebookPanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(true, true, true);
-            }
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread ()
-            {
-                return ActionUpdateThread.BGT;
-            }
-            
-        };
-    }
-
-    private DumbAwareToggleAction initChapterVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showChapter.text"), "", PluginIcons.ChapterCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getChapterPanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, true, true);
-            }
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread ()
-            {
-                return ActionUpdateThread.BGT;
-            }
-            
-        };
-    }
-
-    private DumbAwareToggleAction initNoteVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showNote.text"), "", PluginIcons.NoteCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getNotePanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, false, true);
-            }
-            
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread ()
-            {
-                return ActionUpdateThread.BGT;
-            }
-            
-        };
-    }
-
-    private DumbAwareToggleAction initDetailVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showDetail.text"), "", PluginIcons.Detail) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return true;
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, false, false);
-            }
-            
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread ()
-            {
-                return ActionUpdateThread.BGT;
-            }
-            
-        };
+        // projectStorage.layoutMode is already set by the caller (applyLayoutMode
+        // from the ComboBox, or loadState migration during startup). The legacy
+        // notebookPaneVisible/chapterPaneVisible/notePaneVisible fields are
+        // synced by ProjectStorage.getState() on save for downgrade compat —
+        // no need to write them directly here.
     }
 
     private ChapterPanel getChapterPanel() {

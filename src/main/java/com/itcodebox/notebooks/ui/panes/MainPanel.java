@@ -8,6 +8,7 @@ import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
 import com.itcodebox.notebooks.entity.Chapter;
+import com.itcodebox.notebooks.entity.LayoutMode;
 import com.itcodebox.notebooks.entity.Note;
 import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.entity.Record;
@@ -332,9 +333,12 @@ public class MainPanel extends JPanel {
     }
 
     public void resetPanesVisible() {
-        notebookPanel.setVisible(projectStorage.notebookPaneVisible);
-        chapterPanel.setVisible(projectStorage.chapterPaneVisible);
-        notePanel.setVisible(projectStorage.notePaneVisible);
+        // layoutMode is the source of truth (plugin 1.42+). ProjectStorage
+        // migrates any legacy per-panel booleans into layoutMode on load.
+        LayoutMode mode = projectStorage.layoutMode;
+        notebookPanel.setVisible(mode.isNotebookVisible());
+        chapterPanel.setVisible(mode.isChapterVisible());
+        notePanel.setVisible(mode.isNoteVisible());
     }
 
     /**
