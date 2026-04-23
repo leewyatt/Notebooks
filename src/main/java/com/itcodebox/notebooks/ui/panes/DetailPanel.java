@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.util.Alarm;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -109,6 +110,14 @@ public class DetailPanel extends JPanel {
     private final NotebooksUIManager uiManager;
     private final ProjectStorage projectStorage;
 
+    /**
+     * Debounces the fieldFileType DocumentListener so rapid typing (e.g. "java"
+     * produces 4 keystroke events) collapses into a single DB write. Disposed
+     * with the project.
+     */
+    private static final int FILE_TYPE_DEBOUNCE_MS = 500;
+    private final Alarm fileTypeDebounceAlarm;
+
     private final String URL_REG = "\\s*((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)\\s*";
     private final Pattern urlPattern = Pattern.compile(URL_REG);
     private final ItemListener notebookItemListener;
@@ -152,6 +161,7 @@ public class DetailPanel extends JPanel {
 
         //必须显示的释放Editor
         Disposer.register(project, () -> EditorFactory.getInstance().releaseEditor(fieldContent));
+        fileTypeDebounceAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, project);
         notebookItemListener = e -> notebookTable.selectedRow((Notebook) comboBoxNotebook.getSelectedItem());
         chapterItemListener = e -> chapterTable.selectedRow((Chapter) comboBoxChapter.getSelectedItem());
         noteItemListener = e -> noteTable.selectedRow((Note) comboBoxNote.getSelectedItem());
@@ -229,19 +239,25 @@ public class DetailPanel extends JPanel {
         fieldFileType.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                String fileTye = fieldFileType.getText().trim();
-                Note note = noteTable.getSelectedObject();
-                if (note == null || Objects.equals(fileTye, note.getType())) {
-                    return;
-                }
-                if (PluginConstant.EXTENSION_LIST.contains(fileTye)) {
-                    note.setType(fileTye);
-                    note.setUpdateTime(System.currentTimeMillis());
-                    noteService.update(note);
-                    ApplicationManager.getApplication().getMessageBus()
-                            .syncPublisher(RecordListener.TOPIC)
-                            .onNoteUpdated(project, new Note[]{note});
-                }
+                // Debounce: user typing "java" fires 4 events; only the last
+                // scheduled request 500ms after the last keystroke runs. Avoids
+                // 4 DB writes + 4 message-bus broadcasts per word.
+                fileTypeDebounceAlarm.cancelAllRequests();
+                fileTypeDebounceAlarm.addRequest(() -> {
+                    String fileTye = fieldFileType.getText().trim();
+                    Note note = noteTable.getSelectedObject();
+                    if (note == null || Objects.equals(fileTye, note.getType())) {
+                        return;
+                    }
+                    if (PluginConstant.EXTENSION_LIST.contains(fileTye)) {
+                        note.setType(fileTye);
+                        note.setUpdateTime(System.currentTimeMillis());
+                        noteService.update(note);
+                        ApplicationManager.getApplication().getMessageBus()
+                                .syncPublisher(RecordListener.TOPIC)
+                                .onNoteUpdated(project, new Note[]{note});
+                    }
+                }, FILE_TYPE_DEBOUNCE_MS);
             }
         });
     }
