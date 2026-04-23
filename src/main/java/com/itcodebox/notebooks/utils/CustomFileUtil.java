@@ -159,10 +159,39 @@ public class CustomFileUtil {
     }
 
     /**
+     * Resolve {@code relative} against {@code base}, refusing any result that
+     * escapes the base directory (path traversal / zip-slip protection).
+     * Returns {@code null} on rejection so callers can {@code continue}.
+     *
+     * <p>{@code imageRecord.imagePath} is read from user-editable JSON during
+     * import/export. A malicious or corrupted file could carry {@code "../../"}
+     * segments; without normalization those would let the plugin read/write
+     * files outside its own data directory.
+     */
+    private static Path resolveInside(Path base, String relative) {
+        if (relative == null || relative.isEmpty()) {
+            return null;
+        }
+        try {
+            Path resolved = base.resolve(relative).normalize();
+            Path baseNorm = base.normalize();
+            if (!resolved.startsWith(baseNorm)) {
+                LOG.warn("Rejected path traversal attempt outside " + baseNorm + ": " + relative);
+                return null;
+            }
+            return resolved;
+        } catch (java.nio.file.InvalidPathException e) {
+            LOG.warn("Rejected invalid image path: " + relative, e);
+            return null;
+        }
+    }
+
+    /**
      * 注意 1.  List imageRecords 这里每一条记录都是JSON ,还需要转一次才能得到路径
      * 注意 2.  导出图片时,无需导出缩略图, 因为这里是Markdown需要原图,无需缩略图
      */
     public static void exportImagesToDirectory(List<String> imageRecords, File destDir) throws IOException {
+        Path destDirPath = destDir.toPath();
         for (String imgRecordStr : imageRecords) {
             if (imgRecordStr == null || imgRecordStr.trim().isEmpty()) {
                 continue;
@@ -170,8 +199,13 @@ public class CustomFileUtil {
             List<ImageRecord> recordList = ImageRecordUtil.convertToList(imgRecordStr);
             for (ImageRecord imageRecord : recordList) {
                 try {
-                    File fromFile = PluginConstant.IMAGE_DIRECTORY_PATH.resolve(imageRecord.getImagePath()).toFile();
-                    File toFile = destDir.toPath().resolve(imageRecord.getImagePath()).toFile();
+                    Path fromPath = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, imageRecord.getImagePath());
+                    Path toPath = resolveInside(destDirPath, imageRecord.getImagePath());
+                    if (fromPath == null || toPath == null) {
+                        continue;
+                    }
+                    File fromFile = fromPath.toFile();
+                    File toFile = toPath.toFile();
                     if (!fromFile.exists() || toFile.exists()) {
                         continue;
                     }
@@ -205,7 +239,13 @@ public class CustomFileUtil {
     }
 
     public static void deleteImagesAndThumb(String imageName) throws IOException {
-        PathUtils.deleteFile(PluginConstant.IMAGE_DIRECTORY_PATH.resolve(imageName));
-        PathUtils.deleteFile(PluginConstant.IMAGE_DIRECTORY_PATH.resolve(CustomUIUtil.convertToThumbName(imageName)));
+        Path original = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, imageName);
+        Path thumb = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, CustomUIUtil.convertToThumbName(imageName));
+        if (original != null) {
+            PathUtils.deleteFile(original);
+        }
+        if (thumb != null) {
+            PathUtils.deleteFile(thumb);
+        }
     }
 }
