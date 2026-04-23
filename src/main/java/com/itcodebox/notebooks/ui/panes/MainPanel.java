@@ -8,6 +8,7 @@ import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.ListTableModel;
 import com.itcodebox.notebooks.entity.Chapter;
+import com.itcodebox.notebooks.entity.LayoutMode;
 import com.itcodebox.notebooks.entity.Note;
 import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.entity.Record;
@@ -43,9 +44,13 @@ public class MainPanel extends JPanel {
     private final NotebookPanel notebookPanel;
     private final DetailPanel detailPanel;
     private final ProjectStorage projectStorage;
-    private final JBSplitter leftPane = new JBSplitter(false, 0.5f);
-    private final JBSplitter rightPane = new JBSplitter(false, 0.5F);
-    private final JBSplitter contentPane = new JBSplitter(false, 0.5f);
+    // Proportions are applied from ProjectStorage in the constructor, not at
+    // field init — the ProjectStorage service isn't available yet at this point.
+    // The default JBSplitter(false) constructor starts at 0.5 but we always
+    // overwrite that via setProportion() before the component is shown.
+    private final JBSplitter leftPane = new JBSplitter(false);
+    private final JBSplitter rightPane = new JBSplitter(false);
+    private final JBSplitter contentPane = new JBSplitter(false);
 
 
 
@@ -135,6 +140,20 @@ public class MainPanel extends JPanel {
         contentPane.setFirstComponent(leftPane);
         contentPane.setSecondComponent(rightPane);
         add(contentPane);
+
+        // Apply persisted splitter proportions (GitHub #8) and wire write-back so
+        // every drag is saved. The "proportion" PropertyChangeEvent fires even on
+        // programmatic setProportion calls — that's fine, the write-back is
+        // idempotent (sets a float to the same float).
+        contentPane.setProportion(projectStorage.contentPaneProportion);
+        leftPane.setProportion(projectStorage.leftPaneProportion);
+        rightPane.setProportion(projectStorage.rightPaneProportion);
+        contentPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.contentPaneProportion = contentPane.getProportion());
+        leftPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.leftPaneProportion = leftPane.getProportion());
+        rightPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.rightPaneProportion = rightPane.getProportion());
 
         //1. 恢复组件的可见状态
         resetPanesVisible();
@@ -314,9 +333,12 @@ public class MainPanel extends JPanel {
     }
 
     public void resetPanesVisible() {
-        notebookPanel.setVisible(projectStorage.notebookPaneVisible);
-        chapterPanel.setVisible(projectStorage.chapterPaneVisible);
-        notePanel.setVisible(projectStorage.notePaneVisible);
+        // layoutMode is the source of truth (plugin 1.42+). ProjectStorage
+        // migrates any legacy per-panel booleans into layoutMode on load.
+        LayoutMode mode = projectStorage.layoutMode;
+        notebookPanel.setVisible(mode.isNotebookVisible());
+        chapterPanel.setVisible(mode.isChapterVisible());
+        notePanel.setVisible(mode.isNoteVisible());
     }
 
     /**

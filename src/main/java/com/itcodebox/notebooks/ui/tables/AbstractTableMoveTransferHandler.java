@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.ui.tables;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.TableView;
 import com.intellij.util.ui.ListTableModel;
@@ -25,6 +26,7 @@ import java.lang.reflect.Array;
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractTableMoveTransferHandler<T extends Record> extends TransferHandler {
+    private static final Logger LOG = Logger.getInstance(AbstractTableMoveTransferHandler.class);
     protected final DataFlavor localObjectFlavor;
     protected final AbstractRecordTable<T> table;
     protected final Class<T> clazz;
@@ -157,7 +159,7 @@ public abstract class AbstractTableMoveTransferHandler<T extends Record> extends
                 return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to reorder table rows via drag-and-drop", e);
             return false;
         }
 

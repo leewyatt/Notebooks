@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.ui.toolsettings;
 
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -42,6 +43,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class AppSettingsComponent {
+    private static final Logger LOG = Logger.getInstance(AppSettingsComponent.class);
 
     private final JPanel settingsPanel;
 
@@ -295,7 +297,7 @@ public class AppSettingsComponent {
             }
             return size;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to read custom font size from settings combo box", e);
             return size;
 
         }
@@ -367,7 +369,7 @@ public class AppSettingsComponent {
                     .build();
             Desktop.getDesktop().mail(uri);
         } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to open mail client for contact link", e);
         }
     }
 

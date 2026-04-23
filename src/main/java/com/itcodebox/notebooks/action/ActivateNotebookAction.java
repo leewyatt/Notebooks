@@ -1,16 +1,14 @@
 package com.itcodebox.notebooks.action;
 
 import com.intellij.ide.actions.ActivateToolWindowAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.wm.*;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
 import com.itcodebox.notebooks.ui.panes.MainPanel;
 import com.itcodebox.notebooks.utils.FocusUtil;
+import org.jetbrains.annotations.NotNull;
 
 public class ActivateNotebookAction extends DumbAwareAction {
 
@@ -36,5 +34,11 @@ public class ActivateNotebookAction extends DumbAwareAction {
         // 打开Notebook时编辑区获取焦点
         FocusUtil.getEditorFocus(mainPanel);
 
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread ()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

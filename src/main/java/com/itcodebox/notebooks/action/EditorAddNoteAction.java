@@ -1,7 +1,6 @@
 package com.itcodebox.notebooks.action;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -74,5 +73,11 @@ public class EditorAddNoteAction extends DumbAwareAction {
         note.setOffsetEnd(offsetEnd);
         //显示添加对话框
         new AddNoteDialog(project, note).show();
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread ()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

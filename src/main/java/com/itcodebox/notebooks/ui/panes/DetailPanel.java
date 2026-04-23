@@ -2,10 +2,7 @@ package com.itcodebox.notebooks.ui.panes;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
@@ -14,13 +11,13 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.util.Alarm;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -30,15 +27,18 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.openapi.wm.impl.welcomeScreen.BottomLineBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.*;
 import com.intellij.ui.components.panels.HorizontalBox;
 import com.intellij.util.ui.JBEmptyBorder;
+import com.intellij.util.ui.JBFont;
 import com.itcodebox.notebooks.action.SearchRecordAction;
 import com.itcodebox.notebooks.constant.PluginColors;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.entity.Chapter;
 import com.itcodebox.notebooks.entity.ImageRecord;
+import com.itcodebox.notebooks.entity.LayoutMode;
 import com.itcodebox.notebooks.entity.Note;
 import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.projectservice.NotebooksUIManager;
@@ -112,6 +112,29 @@ public class DetailPanel extends JPanel {
     private final NotebooksUIManager uiManager;
     private final ProjectStorage projectStorage;
 
+    /**
+     * Debounces the fieldFileType DocumentListener so rapid typing (e.g. "java"
+     * produces 4 keystroke events) collapses into a single DB write. Disposed
+     * with the project.
+     */
+    private static final int FILE_TYPE_DEBOUNCE_MS = 500;
+    private final Alarm fileTypeDebounceAlarm;
+
+    /**
+     * Pick the font for the description TextArea. If the user's saved custom
+     * font equals the plugin's original defaults (MONOSPACED, 18pt), assume
+     * they never explicitly picked those values and show the IDE regular UI
+     * font so the description matches other components in the panel. Otherwise
+     * honor their choice.
+     */
+    private static Font resolveDescFont(AppSettingsState settings) {
+        boolean usingPluginDefaults = Font.MONOSPACED.equals(settings.customFontName)
+                && settings.customFontSize == 18;
+        return usingPluginDefaults
+                ? JBFont.regular()
+                : new Font(settings.customFontName, Font.PLAIN, settings.customFontSize);
+    }
+
     private final String URL_REG = "\\s*((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)\\s*";
     private final Pattern urlPattern = Pattern.compile(URL_REG);
     private final ItemListener notebookItemListener;
@@ -155,6 +178,7 @@ public class DetailPanel extends JPanel {
 
         //必须显示的释放Editor
         Disposer.register(project, () -> EditorFactory.getInstance().releaseEditor(fieldContent));
+        fileTypeDebounceAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, project);
         notebookItemListener = e -> notebookTable.selectedRow((Notebook) comboBoxNotebook.getSelectedItem());
         chapterItemListener = e -> chapterTable.selectedRow((Chapter) comboBoxChapter.getSelectedItem());
         noteItemListener = e -> noteTable.selectedRow((Note) comboBoxNote.getSelectedItem());
@@ -162,7 +186,6 @@ public class DetailPanel extends JPanel {
         uiManager = project.getService(NotebooksUIManager.class);
         projectStorage = project.getService(ProjectStorage.class);
         AppSettingsState appSettingsState = AppSettingsState.getInstance();
-        Font textFont = new Font(appSettingsState.customFontName, Font.PLAIN, appSettingsState.customFontSize);
         setLayout(new BorderLayout());
 
         //1. ------创建顶部的界面-----------
@@ -173,8 +196,15 @@ public class DetailPanel extends JPanel {
 
         //1. 笔记描述和笔记内容的容器
         JBSplitter textPanel = new JBSplitter(true, 0.15F);
-        // 设置笔记描述组件
-        fieldDesc.setFont(textFont);
+        // GitHub #6 ("font in description is a little bigger than other"):
+        // the plugin's original defaults (MONOSPACED, 18pt) made the description
+        // TextArea visibly bigger than the surrounding combos / labels / type
+        // field. If the user never customized the font, show the IDE regular
+        // UI font so everything in this panel looks consistent. If the user
+        // DID pick a different value in Settings → Tools → Notebook, respect
+        // that choice. The AppSettingsChangedListener keeps fieldDesc in sync
+        // when the user changes the setting later.
+        fieldDesc.setFont(resolveDescFont(appSettingsState));
         descScrollPane = new JPanel(new BorderLayout(0, 5));
         descScrollPane.add(initDescriptionPanel(), BorderLayout.NORTH);
         descScrollPane.add(new JBScrollPane(fieldDesc));
@@ -232,19 +262,25 @@ public class DetailPanel extends JPanel {
         fieldFileType.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                String fileTye = fieldFileType.getText().trim();
-                Note note = noteTable.getSelectedObject();
-                if (note == null || Objects.equals(fileTye, note.getType())) {
-                    return;
-                }
-                if (PluginConstant.EXTENSION_LIST.contains(fileTye)) {
-                    note.setType(fileTye);
-                    note.setUpdateTime(System.currentTimeMillis());
-                    noteService.update(note);
-                    ApplicationManager.getApplication().getMessageBus()
-                            .syncPublisher(RecordListener.TOPIC)
-                            .onNoteUpdated(project, new Note[]{note});
-                }
+                // Debounce: user typing "java" fires 4 events; only the last
+                // scheduled request 500ms after the last keystroke runs. Avoids
+                // 4 DB writes + 4 message-bus broadcasts per word.
+                fileTypeDebounceAlarm.cancelAllRequests();
+                fileTypeDebounceAlarm.addRequest(() -> {
+                    String fileTye = fieldFileType.getText().trim();
+                    Note note = noteTable.getSelectedObject();
+                    if (note == null || Objects.equals(fileTye, note.getType())) {
+                        return;
+                    }
+                    if (PluginConstant.EXTENSION_LIST.contains(fileTye)) {
+                        note.setType(fileTye);
+                        note.setUpdateTime(System.currentTimeMillis());
+                        noteService.update(note);
+                        ApplicationManager.getApplication().getMessageBus()
+                                .syncPublisher(RecordListener.TOPIC)
+                                .onNoteUpdated(project, new Note[]{note});
+                    }
+                }, FILE_TYPE_DEBOUNCE_MS);
             }
         });
     }
@@ -296,7 +332,7 @@ public class DetailPanel extends JPanel {
         navPanel.add(boxWest, BorderLayout.WEST);
 
         JPanel box = new JPanel(new GridLayout(4, 1));
-        box.add(getVisiblePanelToolbar(box));
+        box.add(buildLayoutComboBox());
         box.add(comboBoxNotebook);
         box.add(comboBoxChapter);
         box.add(comboBoxNote);
@@ -616,18 +652,41 @@ public class DetailPanel extends JPanel {
 
     }
 
-    private JComponent getVisiblePanelToolbar(JComponent target) {
-        ActionManager actionManager = ActionManager.getInstance();
-        DefaultActionGroup actionGroup = new DefaultActionGroup("ACTION_GROUP_VISIBLE_PANEL", false);
-        actionGroup.addSeparator();
-        actionGroup.add(initNotebookVisibleAction());
-        actionGroup.add(initChapterVisibleAction());
-        actionGroup.add(initNoteVisibleAction());
-        actionGroup.add(initDetailVisibleAction());
+    /**
+     * Build the layout-mode ComboBox that replaced the old four-icon toggle
+     * row. The icons gave no affordance of being clickable and their
+     * {@code isSelected()} semantics showed three of four as "on" in FULL mode
+     * — misleading users into treating radio-style modes as independent
+     * toggles. A ComboBox with icon+label rendering removes that ambiguity.
+     */
+    private JComponent buildLayoutComboBox() {
+        ComboBox<LayoutMode> combo = new ComboBox<>(LayoutMode.values());
+        combo.setRenderer(SimpleListCellRenderer.create((label, mode, index) -> {
+            if (mode != null) {
+                label.setIcon(mode.getIcon());
+                label.setText(message(mode.getBundleKey()));
+            }
+        }));
+        combo.setSelectedItem(projectStorage.layoutMode);
+        combo.setToolTipText(message("mainPanel.layout.label"));
+        combo.addActionListener(e -> {
+            LayoutMode picked = (LayoutMode) combo.getSelectedItem();
+            if (picked != null && picked != projectStorage.layoutMode) {
+                applyLayoutMode(picked);
+            }
+        });
+        return combo;
+    }
 
-        ActionToolbar actionToolbar = actionManager.createActionToolbar("ACTION_GROUP_VISIBLE_PANEL", actionGroup, true);
-        actionToolbar.setTargetComponent(target);
-        return actionToolbar.getComponent();
+    /**
+     * Apply a layout mode: update panel visibility, persist to
+     * {@link ProjectStorage}, and delegate to {@link #controlViewVisible}
+     * so the tool-window width recomputation path is identical to the old
+     * toggle-button behavior.
+     */
+    private void applyLayoutMode(LayoutMode mode) {
+        projectStorage.layoutMode = mode;
+        controlViewVisible(mode.isNotebookVisible(), mode.isChapterVisible(), mode.isNoteVisible());
     }
 
     private JComponent getNoteToolbar(JComponent target) {
@@ -661,6 +720,12 @@ public class DetailPanel extends JPanel {
                 e.getPresentation().setIcon(descScrollPane.isVisible() ? PluginIcons.Hide : PluginIcons.Show);
                 e.getPresentation().setText(descScrollPane.isVisible() ? message("detailPanel.action.showDesc.hide") : message("detailPanel.action.showDesc.show"));
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
         };
     }
 
@@ -671,6 +736,11 @@ public class DetailPanel extends JPanel {
             public void actionPerformed(@NotNull AnActionEvent e) {
                 northPanel.setVisible(!northPanel.isVisible());
                 e.getPresentation().setIcon(northPanel.isVisible() ? AllIcons.Actions.Collapseall : AllIcons.Actions.Expandall);
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -690,6 +760,11 @@ public class DetailPanel extends JPanel {
             public void update(@NotNull AnActionEvent e) {
                 Note selectedNote = noteTable.getSelectedObject();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getContent().isEmpty());
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -776,6 +851,12 @@ public class DetailPanel extends JPanel {
                 Note selectedNote = noteTable.getSelectedObject();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getSource().isEmpty());
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
 
         };
     }
@@ -805,6 +886,12 @@ public class DetailPanel extends JPanel {
                 Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
                 e.getPresentation().setEnabled(selectedNote != null && !selectedNote.getContent().isEmpty() && selectedTextEditor != null && selectedTextEditor.getDocument().isWritable());
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -814,7 +901,13 @@ public class DetailPanel extends JPanel {
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 getNotePanel().doAddNote();
             }
-
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
             @Override
             public void update(@NotNull AnActionEvent e) {
                 e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
@@ -891,6 +984,12 @@ public class DetailPanel extends JPanel {
 
                 return imageInfoChanged;
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+            
         };
     }
 
@@ -913,11 +1012,13 @@ public class DetailPanel extends JPanel {
     }
 
     private int computeWidth(int oldSize, int newSize, int oldWidth) {
-        boolean b1 = getMainPanel().getNotebookPanel().isVisible();
-        boolean b2 = getMainPanel().getChapterPanel().isVisible();
-        getMainPanel().getLeftPane().setProportion(0.5f);
-        getMainPanel().getRightPane().setProportion(0.5f);
-        getMainPanel().getContentPane().setProportion(!b1 && b2 ? 0.333333333f : 0.5f);
+        // Previously this method also forcibly reset the three splitter
+        // proportions to 0.5 / 0.5 / (0.33 or 0.5) on every layout-mode switch.
+        // With the persist-on-drag behavior added for GitHub #8, that reset
+        // undid the user's own drag adjustments whenever they switched modes.
+        // MainPanel now owns splitter proportions (loaded from ProjectStorage),
+        // so we only compute the target tool-window width here and leave
+        // proportions alone.
         return (int) (oldWidth * 1.0 / oldSize * newSize);
     }
 
@@ -932,65 +1033,11 @@ public class DetailPanel extends JPanel {
         getNotePanel().setVisible(notePanelVisible);
         int newSize = getPanelSize();
         setToolWindowWidth(oldSize, newSize);
-        projectStorage.notebookPaneVisible = notebookPanelVisible;
-        projectStorage.chapterPaneVisible = chapterPanelVisible;
-        projectStorage.notePaneVisible = notePanelVisible;
-    }
-
-    private DumbAwareToggleAction initNotebookVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showNotebook.text"), "", PluginIcons.NotebookCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getNotebookPanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(true, true, true);
-            }
-        };
-    }
-
-    private DumbAwareToggleAction initChapterVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showChapter.text"), "", PluginIcons.ChapterCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getChapterPanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, true, true);
-            }
-        };
-    }
-
-    private DumbAwareToggleAction initNoteVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showNote.text"), "", PluginIcons.NoteCell) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return getNotePanel().isVisible();
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, false, true);
-            }
-        };
-    }
-
-    private DumbAwareToggleAction initDetailVisibleAction() {
-        return new DumbAwareToggleAction(message("mainPanel.action.showDetail.text"), "", PluginIcons.Detail) {
-            @Override
-            public boolean isSelected(@NotNull AnActionEvent anActionEvent) {
-                return true;
-            }
-
-            @Override
-            public void setSelected(@NotNull AnActionEvent anActionEvent, boolean b) {
-                controlViewVisible(false, false, false);
-            }
-        };
+        // projectStorage.layoutMode is already set by the caller (applyLayoutMode
+        // from the ComboBox, or loadState migration during startup). The legacy
+        // notebookPaneVisible/chapterPaneVisible/notePaneVisible fields are
+        // synced by ProjectStorage.getState() on save for downgrade compat —
+        // no need to write them directly here.
     }
 
     private ChapterPanel getChapterPanel() {

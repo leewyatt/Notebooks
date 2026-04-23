@@ -1,16 +1,20 @@
 package com.itcodebox.notebooks.dao.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.dao.BaseDAO;
 import com.itcodebox.notebooks.dao.NotebookDao;
 import com.itcodebox.notebooks.entity.Notebook;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
  * @author LeeWyatt
  */
 public class NotebookDaoImpl extends BaseDAO<Notebook> implements NotebookDao {
+
+    private static final Logger LOG = Logger.getInstance(NotebookDaoImpl.class);
 
     private static NotebookDaoImpl instance;
 
@@ -76,12 +80,37 @@ public class NotebookDaoImpl extends BaseDAO<Notebook> implements NotebookDao {
 
     @Override
     public void delete(Connection conn, Integer id) {
-        String sql1 = "delete from note where notebook_id=?;";
-        update(conn, sql1, id);
-        String sql2 = "delete from chapter where notebook_id=?;";
-        update(conn, sql2, id);
-        String sql3 = "delete from notebook where id =?;";
-        update(conn, sql3, id);
+        // Transactional cascade: notes -> chapters -> notebook. Without the
+        // transaction, a failure between any two steps leaves orphan rows
+        // (chapters with no parent notebook, etc.) and the UI shows stale
+        // children that can't be re-selected.
+        //
+        // NOTE: we intentionally bypass BaseDAO.update(conn, sql) here because
+        // that helper swallows SQLException internally — which would defeat
+        // rollback. queryRunner.update(conn, sql) propagates the exception so
+        // the catch block actually runs.
+        boolean originalAutoCommit = true;
+        try {
+            originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            queryRunner.update(conn, "delete from note where notebook_id=?;", id);
+            queryRunner.update(conn, "delete from chapter where notebook_id=?;", id);
+            queryRunner.update(conn, "delete from notebook where id=?;", id);
+            conn.commit();
+        } catch (SQLException e) {
+            LOG.warn("Failed to delete notebook " + id + "; rolling back", e);
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackEx) {
+                LOG.warn("Rollback failed after notebook delete error", rollbackEx);
+            }
+        } finally {
+            try {
+                conn.setAutoCommit(originalAutoCommit);
+            } catch (SQLException restoreEx) {
+                LOG.warn("Failed to restore autoCommit after notebook delete", restoreEx);
+            }
+        }
     }
 
     @Override

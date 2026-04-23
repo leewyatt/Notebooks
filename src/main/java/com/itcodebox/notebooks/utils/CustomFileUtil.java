@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -29,6 +30,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class CustomFileUtil {
+    private static final Logger LOG = Logger.getInstance(CustomFileUtil.class);
 
     /**
      * 统计(缩略图)文件夹的大小 (不包含子目录, 因为缓存图片,都在同一目录下)
@@ -87,7 +89,7 @@ public class CustomFileUtil {
             try {
                 return Files.createDirectories(parentPath.resolve(dirName));
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOG.warn("Failed to create export directory", ioException);
             }
         }
         return null;
@@ -157,10 +159,40 @@ public class CustomFileUtil {
     }
 
     /**
+     * Resolve {@code relative} against {@code base}, refusing any result that
+     * escapes the base directory (path traversal / zip-slip protection).
+     * Returns {@code null} on rejection so callers can {@code continue}.
+     *
+     * <p>{@code imageRecord.imagePath} is read from user-editable JSON during
+     * import/export. A malicious or corrupted file could carry {@code "../../"}
+     * segments; without normalization those would let the plugin read/write
+     * files outside its own data directory.
+     */
+    private static Path resolveInside(Path base, String relative) {
+        if (relative == null || relative.isEmpty()) {
+            return null;
+        }
+        try {
+            Path resolved = base.resolve(relative).normalize();
+            Path baseNorm = base.normalize();
+            if (!resolved.startsWith(baseNorm)) {
+                LOG.warn("Rejected path traversal attempt outside " + baseNorm + ": " + relative);
+                return null;
+            }
+            return resolved;
+        } catch (java.nio.file.InvalidPathException e) {
+            LOG.warn("Rejected invalid image path: " + relative, e);
+            return null;
+        }
+    }
+
+    /**
      * 注意 1.  List imageRecords 这里每一条记录都是JSON ,还需要转一次才能得到路径
      * 注意 2.  导出图片时,无需导出缩略图, 因为这里是Markdown需要原图,无需缩略图
      */
     public static void exportImagesToDirectory(List<String> imageRecords, File destDir) throws IOException {
+        Path destDirPath = destDir.toPath();
+        int missing = 0;
         for (String imgRecordStr : imageRecords) {
             if (imgRecordStr == null || imgRecordStr.trim().isEmpty()) {
                 continue;
@@ -168,16 +200,32 @@ public class CustomFileUtil {
             List<ImageRecord> recordList = ImageRecordUtil.convertToList(imgRecordStr);
             for (ImageRecord imageRecord : recordList) {
                 try {
-                    File fromFile = PluginConstant.IMAGE_DIRECTORY_PATH.resolve(imageRecord.getImagePath()).toFile();
-                    File toFile = destDir.toPath().resolve(imageRecord.getImagePath()).toFile();
-                    if (!fromFile.exists() || toFile.exists()) {
+                    Path fromPath = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, imageRecord.getImagePath());
+                    Path toPath = resolveInside(destDirPath, imageRecord.getImagePath());
+                    if (fromPath == null || toPath == null) {
+                        continue;
+                    }
+                    File fromFile = fromPath.toFile();
+                    File toFile = toPath.toFile();
+                    if (toFile.exists()) {
+                        continue;
+                    }
+                    if (!fromFile.exists()) {
+                        missing++;
+                        LOG.warn("Image referenced by a note is missing on disk: " + fromFile);
                         continue;
                     }
                     FileUtil.copy(fromFile, toFile);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    LOG.warn("Failed to copy image file to export directory", exception);
                 }
             }
+        }
+        if (missing > 0) {
+            // Caller (ExportUtil) can decide whether to surface this; log.warn makes
+            // the count discoverable from idea.log when users report "my export is
+            // missing pictures".
+            LOG.warn(missing + " image file(s) referenced by notes were missing and skipped during export.");
         }
     }
 
@@ -196,14 +244,20 @@ public class CustomFileUtil {
                 try {
                     deleteImagesAndThumb(imageRecord.getImagePath());
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    LOG.warn("Failed to delete image and thumbnail for record", exception);
                 }
             }
         }
     }
 
     public static void deleteImagesAndThumb(String imageName) throws IOException {
-        PathUtils.deleteFile(PluginConstant.IMAGE_DIRECTORY_PATH.resolve(imageName));
-        PathUtils.deleteFile(PluginConstant.IMAGE_DIRECTORY_PATH.resolve(CustomUIUtil.convertToThumbName(imageName)));
+        Path original = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, imageName);
+        Path thumb = resolveInside(PluginConstant.IMAGE_DIRECTORY_PATH, CustomUIUtil.convertToThumbName(imageName));
+        if (original != null) {
+            PathUtils.deleteFile(original);
+        }
+        if (thumb != null) {
+            PathUtils.deleteFile(thumb);
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.itcodebox.notebooks.action;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.itcodebox.notebooks.ui.dialog.SearchDialog;
@@ -24,5 +23,11 @@ public class SearchRecordAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         Project project = anActionEvent.getRequiredData(CommonDataKeys.PROJECT);
         new SearchDialog(project).show();
+    }
+    
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread ()
+    {
+        return ActionUpdateThread.BGT;
     }
 }

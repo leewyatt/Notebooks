@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.ui.tables;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.itcodebox.notebooks.entity.Chapter;
@@ -34,6 +35,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class NotebookTableDragOnTransferHandler extends TransferHandler {
+    private static final Logger LOG = Logger.getInstance(NotebookTableDragOnTransferHandler.class);
     private final DataFlavor localObjectFlavor;
     private final NotebookTable table;
     private final Project project;
@@ -114,7 +116,7 @@ public class NotebookTableDragOnTransferHandler extends TransferHandler {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to move chapter to another notebook via drag-on", e);
             return false;
         }
     }

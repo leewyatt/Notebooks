@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.ui.dialog;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.project.Project;
@@ -30,6 +31,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class FullImageDialog extends DialogWrapper {
+    private static final Logger LOG = Logger.getInstance(FullImageDialog.class);
     private final String fileName;
     private final Project project;
     private final File file;
@@ -89,7 +91,7 @@ public class FullImageDialog extends DialogWrapper {
                 try {
                     CustomUIUtil.writeToClipboard(ImageIO.read(file));
                 } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    LOG.warn("Failed to copy image to clipboard", ioException);
                 }
             }
 
@@ -117,7 +119,7 @@ public class FullImageDialog extends DialogWrapper {
                     try {
                         FileUtil.copy(file, new File(targetFile.getCanonicalPath()));
                     } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                        LOG.warn("Failed to export image file", ioException);
                     }
                 }
             }

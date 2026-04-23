@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.util.ui.JBFont;
 import com.itcodebox.notebooks.constant.PluginConstant;
@@ -15,9 +16,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
@@ -29,6 +28,8 @@ import java.time.format.DateTimeFormatter;
  * @author LeeWyatt
  */
 public class CustomUIUtil {
+    private static final Logger LOG = Logger.getInstance(CustomUIUtil.class);
+
     public static JBFont getMyDefaultFont() {
         return JBFont.create(new Font(Font.MONOSPACED, Font.PLAIN, 18));
     }
@@ -42,7 +43,7 @@ public class CustomUIUtil {
         try {
             imgSrc = resource.toURI().toString();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to convert resource URL to URI", e);
         }
         return imgSrc;
     }
@@ -105,7 +106,7 @@ public class CustomUIUtil {
                 return (Image) t.getTransferData(DataFlavor.imageFlavor);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to read image from clipboard", e);
         }
 
         return null;
@@ -222,9 +223,10 @@ public class CustomUIUtil {
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         graphics.drawImage(originImage, 0, 0, null);
         graphics.dispose();
-        OutputStream out = new FileOutputStream(destFile);
+        // ImageIO.write(destImage, extension, destFile) opens its own stream internally;
+        // the previous code also allocated a FileOutputStream that was never used and
+        // leaked on exception. Removed.
         ImageIO.write(destImage, extension, destFile);
-        out.close();
     }
 
 }

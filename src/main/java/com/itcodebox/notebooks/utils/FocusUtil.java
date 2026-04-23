@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.utils;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.ui.JBSplitter;
 import com.itcodebox.notebooks.ui.panes.DetailPanel;
@@ -14,6 +15,7 @@ import java.lang.reflect.Method;
  * @Since version-1.0
  */
 public class FocusUtil {
+    private static final Logger LOG = Logger.getInstance(FocusUtil.class);
 
     /**
      * 使打开Notebook时焦点在编辑区
@@ -31,7 +33,7 @@ public class FocusUtil {
             requestFocus.setAccessible(true);
             requestFocus.invoke(fieldContent);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.warn("Failed to request focus on editor via reflection", ex);
         }
     }
 }

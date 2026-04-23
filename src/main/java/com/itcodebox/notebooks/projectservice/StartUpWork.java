@@ -11,13 +11,20 @@ import org.jetbrains.annotations.Nullable;
 
 public class StartUpWork implements ProjectActivity {
 
+    /**
+     * Called by the platform once per project open. Implements the Kotlin
+     * {@code suspend} contract from Java by returning {@link Unit#INSTANCE}
+     * synchronously — we do no async work here, so there's no reason to
+     * return {@code COROUTINE_SUSPENDED} or the continuation itself (the
+     * previous code did the latter, which is not a valid suspend return).
+     */
     @Nullable
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         @NotNull Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         if (openProjects.length == 1) {
-            ImportUtil.publishReadOnlyMode(project,false);
+            ImportUtil.publishReadOnlyMode(project, false);
         }
-        return continuation;
+        return Unit.INSTANCE;
     }
 }

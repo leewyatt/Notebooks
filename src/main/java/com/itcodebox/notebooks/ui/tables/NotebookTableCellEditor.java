@@ -2,6 +2,8 @@ package com.itcodebox.notebooks.ui.tables;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.itcodebox.notebooks.constant.PluginColors;
+import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.entity.Notebook;
 import com.itcodebox.notebooks.projectservice.RecordListener;
 import com.itcodebox.notebooks.service.NotebookService;
@@ -27,7 +29,7 @@ public class NotebookTableCellEditor extends DefaultCellEditor implements TableC
         super(textField);
         this.project = project;
         this.textField = textField;
-        setClickCountToStart(200);
+        setClickCountToStart(PluginConstant.TABLE_EDIT_CLICK_COUNT_START);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class NotebookTableCellEditor extends DefaultCellEditor implements TableC
                     message("notify.renameFailed.title"),
                     "<html><body>" +
                             message("notify.renameFailed.message1.notebook") +
-                            "<span style='color:red;font-weight: 700;'>" + title + " </span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + " </span>" +
                             message("notify.renameFailed.message2.null") +
                             "</body></html>");
             textField.setText(notebook.getTitle());
@@ -52,13 +54,13 @@ public class NotebookTableCellEditor extends DefaultCellEditor implements TableC
                     message("notify.renameFailed.title"),
                     "<html><body>" +
                             message("notify.renameFailed.message1.notebook") +
-                            "<span style='color:red;font-weight: 700;'>" + title + " </span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + " </span>" +
                             message("notify.renameFailed.message2.exists") +
                             "<br />" +
                             message("notify.renameFailed.message3") +
-                            "<span style='color:blue;font-weight: 700;'>" + notebook.getTitle() + " </span>" +
+                            "<span style='color:" + PluginColors.emphasisHtmlColor() + ";font-weight: 700;'>" + notebook.getTitle() + " </span>" +
                             message("notify.renameFailed.message4") +
-                            "<span style='color:red;font-weight: 700;'>" + title + "</span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + "</span>" +
                             message("notify.renameFailed.message5") +
                             "</body></html>");
             textField.setText(notebook.getTitle());

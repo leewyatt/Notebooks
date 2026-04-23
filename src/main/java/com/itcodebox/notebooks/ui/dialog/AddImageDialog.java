@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.ui.dialog;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -47,6 +48,7 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class AddImageDialog extends DialogWrapper {
+    private static final Logger LOG = Logger.getInstance(AddImageDialog.class);
     /**
      * 添加面板的图片最大尺寸
      */
@@ -193,7 +195,7 @@ public class AddImageDialog extends DialogWrapper {
                     imagePathField.setText(imgTempFile.getAbsolutePath());
 
                 } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    LOG.warn("Failed to write clipboard image to temporary file", ioException);
                 }
                 imageLabel.setIcon(CustomUIUtil.scaleImageIcon(icon, IMAGE_MAX_SIZE));
             } else {
@@ -225,7 +227,7 @@ public class AddImageDialog extends DialogWrapper {
             //创建缩略图
             CustomUIUtil.writeThumbImageToFile(originFile, PluginConstant.IMAGE_DIRECTORY_PATH.resolve(thumbFileName).toFile());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to copy image and create thumbnail while adding image", e);
         }
         ImageRecord imageRecord = new ImageRecord(imageTitleField.getText(), imageDescTextArea.getText(), fileName);
         List<ImageRecord> records = new ArrayList<>(imageTable.getListTableModel().getItems());

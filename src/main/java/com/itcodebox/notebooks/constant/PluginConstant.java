@@ -78,6 +78,13 @@ public interface PluginConstant {
     int MIN_FONT_SIZE = 8;
     int MAX_FONT_SIZE = 72;
 
+    /**
+     * Click-count / delay used by table cell editors before entering edit mode.
+     * 200 is the standard Swing "double-click grace" value; extracted here to
+     * avoid the same magic literal in three CellEditor classes.
+     */
+    int TABLE_EDIT_CLICK_COUNT_START = 200;
+
     String QQ_GROUP = "715598051";
     String URL_GITHUB = "https://github.com/leewyatt";
     String EMAIL_GMAIL = "leewyatt7788@gmail.com";

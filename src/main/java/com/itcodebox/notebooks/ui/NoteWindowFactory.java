@@ -1,9 +1,7 @@
 package com.itcodebox.notebooks.ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -77,6 +75,7 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
         DefaultActionGroup gearActions = new DefaultActionGroup();
         gearActions.add(initActionExportJson());
         gearActions.add(initActionImportJson());
+        gearActions.add(initActionExportMarkdownTree());
         gearActions.add(new Separator());
         gearActions.add(initActionClearCache());
         tw.setAdditionalGearActions(gearActions);
@@ -96,6 +95,11 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
                 }
 
             }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
         };
     }
 
@@ -108,6 +112,12 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
                 ApplicationManager.getApplication().getMessageBus().syncPublisher(RecordListener.TOPIC)
                         .onRefresh();
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
         };
     }
 
@@ -117,6 +127,11 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 new TipForUsingDialog().show();
+            }
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -146,6 +161,51 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
             public void update(@NotNull AnActionEvent e) {
                 e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
             }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
+            }
+        };
+    }
+
+    private DumbAwareAction initActionExportMarkdownTree() {
+        return new DumbAwareAction(
+                message("mainPanel.action.exportMarkdownTree.text"),
+                message("mainPanel.action.exportMarkdownTree.description"),
+                PluginIcons.MarkdownFile) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                // Refresh so we pick up any other open project's writes.
+                ApplicationManager.getApplication().getMessageBus().syncPublisher(RecordListener.TOPIC)
+                        .onRefresh();
+                if (mainPanel.getNotebookTable().getRowCount() < 1) {
+                    Messages.showMessageDialog(
+                            project,
+                            message("mainPanel.action.exportJson.empty.message"),
+                            message("mainPanel.action.exportJson.empty.title"),
+                            Messages.getInformationIcon());
+                    return;
+                }
+                DateTimeFormatter fileTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                String fileTimeStr = fileTimeFormatter.format(LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(System.currentTimeMillis()), ZoneId.systemDefault()));
+                Path path = CustomFileUtil.choosePath(project, "Notebook_Markdown_" + fileTimeStr);
+                if (path != null) {
+                    ExportUtil.exportMarkdownTree(project, path, fileTimeStr);
+                }
+            }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
         };
     }
 
@@ -163,6 +223,12 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
                         .getMessageBus()
                         .syncPublisher(AppSettingsChangedListener.TOPIC)
                         .onSetItemExpandable(b);
+            }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }
@@ -212,6 +278,12 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
             @Override
             public void update(@NotNull AnActionEvent e) {
                 e.getPresentation().setEnabled(!AppSettingsState.getInstance().readOnlyMode);
+            }
+            
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread ()
+            {
+                return ActionUpdateThread.BGT;
             }
         };
     }

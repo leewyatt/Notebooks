@@ -1,6 +1,7 @@
 package com.itcodebox.notebooks.service.impl;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.dao.NoteDao;
 import com.itcodebox.notebooks.dao.impl.NoteDaoImpl;
 import com.itcodebox.notebooks.entity.Note;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author LeeWyatt
  */
 public class  NoteServiceImpl implements NoteService {
+    private static final Logger LOG = Logger.getInstance(NoteServiceImpl.class);
     private final DatabaseBasicService databaseBasicService = ApplicationManager.getApplication().getService(DatabaseBasicService.class);
     private final NoteDao noteDao = NoteDaoImpl.getInstance();
 
@@ -32,7 +34,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.insert(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch insert notes", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -45,7 +47,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.insert(conn, note);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to insert note", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -59,7 +61,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.delete(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete note by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -72,7 +74,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.update(conn, ary);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to batch update notes", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -85,7 +87,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.update(conn, note);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to update note", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -98,7 +100,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.findById(conn, id);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find note by id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -112,7 +114,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.exchangeShowOrder(conn, showOrder1, showOrder2);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to exchange note show order", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -125,7 +127,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.findAllByChapterId(conn, chapterId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find all notes by chapter id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -139,7 +141,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.deleteAllByChapterId(conn, chapterId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete all notes by chapter id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -152,7 +154,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             noteDao.deleteAllByNotebookId(conn, notebookId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to delete all notes by notebook id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -165,7 +167,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.getTitles(conn, notebookTitle, chapterTitle);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get note titles for chapter", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -179,7 +181,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.findByTitle(conn, noteTitle,chapterId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find note by title within chapter", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -193,7 +195,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.findByTitles(conn,noteTile ,chapterTitle,notebookTitle);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to find note by full title path", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -207,7 +209,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.getImageRecordsByNotebookId(conn,notebookId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get image records by notebook id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -221,7 +223,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.getImageRecordsByChapterId(conn,chapterId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get image records by chapter id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }
@@ -235,7 +237,7 @@ public class  NoteServiceImpl implements NoteService {
             conn = databaseBasicService.getConnection();
             return noteDao.getImageRecordsByNoteId(conn,noteId);
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to get image records by note id", throwables);
         } finally {
             databaseBasicService.closeResource(conn, null, null);
         }

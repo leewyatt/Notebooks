@@ -1,7 +1,8 @@
 package com.itcodebox.notebooks.service;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.constant.PluginConstant;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 
@@ -21,6 +22,7 @@ import java.util.List;
  * @author LeeWyatt
  */
 public class DatabaseBasicService {
+    private static final Logger LOG = Logger.getInstance(DatabaseBasicService.class);
     private  static final String DATABASE_DRIVER = "org.sqlite.JDBC";
     private  static final String DATABASE_URL = "jdbc:sqlite:" + PluginConstant.DB_FILE_PATH;
     private static final String EDITOR_OFFSET_START = "offset_start";
@@ -29,18 +31,21 @@ public class DatabaseBasicService {
     private  BasicDataSource source;
 
     public DatabaseBasicService() {
+        // 如果不存在,创建DB文件 (must run before backup so backups dir is created alongside).
+        createFileAndDir();
+        // 升级时自动备份 notebooks.db 到 ~/.ideaNotebooksFile/backups/ —
+        // 必须在 initTable() 的 ALTER TABLE 之前跑，保存迁移前的原始数据。
+        DatabaseBackupService.backupIfVersionChanged();
         try {
             //创建了DBCP的数据库连接池
             source = new BasicDataSource();
             //设置基本信息
-            source.setMaxActive(1);
+            source.setMaxTotal(1);
             source.setDriverClassName(DATABASE_DRIVER);
             source.setUrl(DATABASE_URL);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to initialize SQLite data source", e);
         }
-        // 如果不存在,创建DB文件
-        createFileAndDir();
         // 如果表不存在,创建表
         initTable();
     }
@@ -62,21 +67,21 @@ public class DatabaseBasicService {
             try {
                 rs.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close ResultSet", e);
             }
         }
         if (statement != null) {
             try {
                 statement.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close Statement", e);
             }
         }
         if (conn != null) {
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to close database Connection", e);
             }
         }
     }
@@ -90,7 +95,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.PROJECT_DB_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create plugin database directory", e);
             }
         }
         //"C:\Users\Administrator\.ideaNotebooksFile\notebooks.db"
@@ -98,7 +103,7 @@ public class DatabaseBasicService {
             try {
                 Files.createFile(PluginConstant.DB_FILE_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create SQLite database file", e);
             }
         }
         //创建图片文件夹.
@@ -106,7 +111,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.IMAGE_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create image directory", e);
             }
         }
 
@@ -115,7 +120,7 @@ public class DatabaseBasicService {
             try {
                 Files.createDirectories(PluginConstant.TEMP_IMAGE_DIRECTORY_PATH);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to create temporary image directory", e);
             }
         }
     }
@@ -182,7 +187,7 @@ public class DatabaseBasicService {
                 queryRunner.update(addColImageRecords);
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOG.warn("Failed to initialize SQLite tables", throwables);
         }
     }
 
@@ -194,15 +199,16 @@ public class DatabaseBasicService {
      * @return true 存在该字段 false 不存在该字段
      * @throws SQLException sql异常
      */
-    private boolean isColumnExists (String table, String column,QueryRunner queryRunner ) throws SQLException {
-        boolean isExists = false;
-        List<String> name = queryRunner.query("PRAGMA table_info("+table+")", new ColumnListHandler<String>("name"));
+    private boolean isColumnExists(String table, String column, QueryRunner queryRunner) throws SQLException {
+        List<String> name = queryRunner.query("PRAGMA table_info(" + table + ")", new ColumnListHandler<String>("name"));
+        if (name == null) {
+            return false;
+        }
         for (String s : name) {
             if (column.equalsIgnoreCase(s)) {
-                isExists = true;
-                break;
+                return true;
             }
         }
-        return isExists;
+        return false;
     }
 }

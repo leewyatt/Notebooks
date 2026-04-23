@@ -3,6 +3,7 @@ package com.itcodebox.notebooks.ui.component;
 import com.intellij.lang.Language;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -24,6 +25,7 @@ import java.util.HashMap;
  * @author LeeWyatt
  */
 public class CodeEditorUtil {
+    private static final Logger LOG = Logger.getInstance(CodeEditorUtil.class);
     private static final HashMap<String, SyntaxHighlighter> HIGHLIGHTER_MAP = new HashMap<>();
     private static final IElementType TEXT_ELEMENT_TYPE = new IElementType("TEXT", Language.ANY);
     private static final PlainSyntaxHighlighter PLAIN_SYNTAX_HIGHLIGHTER = new PlainSyntaxHighlighter();
@@ -43,17 +45,17 @@ public class CodeEditorUtil {
         try {
             HIGHLIGHTER_MAP.put("html", new com.intellij.ide.highlighter.HtmlFileHighlighter());
         } catch (Error e) {
-            e.printStackTrace();
+            LOG.warn("Failed to register HTML syntax highlighter", e);
         }
         try {
             HIGHLIGHTER_MAP.put("xml", new com.intellij.ide.highlighter.XmlFileHighlighter());
         } catch (Error e) {
-            e.printStackTrace();
+            LOG.warn("Failed to register XML syntax highlighter", e);
         }
         try {
             HIGHLIGHTER_MAP.put("json", new com.intellij.json.highlighting.JsonSyntaxHighlighterFactory().getSyntaxHighlighter(null, null));
         } catch (Error e) {
-            e.printStackTrace();
+            LOG.warn("Failed to register JSON syntax highlighter", e);
         }
         CustomHighlighterFactory factory = new CustomHighlighterFactory();
 

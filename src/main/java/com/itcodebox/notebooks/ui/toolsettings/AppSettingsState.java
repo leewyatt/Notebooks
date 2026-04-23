@@ -54,14 +54,23 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public String markdownTemplate132 = MARKDOWN_GROOVY_TEMPLATE;
 
     /**
-     * 只读模式。true 开启，false 关闭
+     * 只读模式。true 开启，false 关闭.
+     * volatile because ImportUtil writes this from a background task while
+     * action update() handlers read it on the EDT / BGT update thread.
      */
-    public boolean readOnlyMode = false;
+    public volatile boolean readOnlyMode = false;
 
     /**
      * Table选中时，是否显示边框
      */
     public boolean showFocusBorder = true;
+
+    /**
+     * 最后一次成功启动时记录的插件版本号。用于触发"升级时自动备份"逻辑：
+     * 值不等于当前插件版本时 DatabaseBackupService 会拷贝一份 notebooks.db
+     * 到 backups 目录，然后把此字段更新为当前版本。字段仅新增不删除。
+     */
+    public String lastKnownPluginVersion = "";
 
 
     ///**
