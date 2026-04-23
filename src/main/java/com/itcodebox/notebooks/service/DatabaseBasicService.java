@@ -1,7 +1,7 @@
 package com.itcodebox.notebooks.service;
 
 import com.itcodebox.notebooks.constant.PluginConstant;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 
@@ -33,7 +33,7 @@ public class DatabaseBasicService {
             //创建了DBCP的数据库连接池
             source = new BasicDataSource();
             //设置基本信息
-            source.setMaxActive(1);
+            source.setMaxTotal(1);
             source.setDriverClassName(DATABASE_DRIVER);
             source.setUrl(DATABASE_URL);
         } catch (Exception e) {

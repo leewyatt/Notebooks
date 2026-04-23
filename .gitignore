@@ -1,3 +1,6 @@
 /.idea/
 /.gradle/
 /build
+/.devdoc/
+/.intellijPlatform/
+.DS_Store

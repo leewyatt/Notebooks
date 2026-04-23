@@ -74,9 +74,9 @@
         </ul>
     ]]></change-notes>
 
+    <!-- since-build is now controlled by build.gradle.kts patchPluginXml.sinceBuild.
+         Leave until-build empty so users on newer IDE versions don't get locked out. -->
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <!--    <idea-version since-build="203.8084.24"/>-->
-    <idea-version since-build="222.3345.118"/>
 
     <resource-bundle>messages.NotebooksBundle</resource-bundle>
 
