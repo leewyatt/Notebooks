@@ -88,6 +88,11 @@
     <!--    <depends>com.intellij.modules.java</depends>-->
     <!--  Kotlin高亮  -->
     <!--    <depends>org.jetbrains.kotlin</depends>-->
+    <!--  The supportsKotlinPluginMode declaration required by IDEA 2024.2.1+
+          lives in kotlin-doc.xml (loaded only when Kotlin is present). DevKit
+          can't follow config-file references when validating, so the warning
+          here is cosmetic. -->
+    <!--suppress PluginXmlValidity -->
     <depends optional="true" config-file="kotlin-doc.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="java-doc.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="json-doc.xml">com.intellij.modules.json</depends>
