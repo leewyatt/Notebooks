@@ -23,8 +23,6 @@ import groovy.text.Template;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -84,18 +82,15 @@ public class ExportUtil {
                                 return;
                             }
 
-                            // 通知: 导出成功: 因为前面没有抛出异常 能运行到这里说明保存已经成功
-                            try {
-                                URL jsonUrl = jsonPath.toUri().toURL();
-                                NotifyUtil.showInfoNotification(
-                                        project,
-                                        PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
-                                        message("notify.exportSucceed.json.title"),
-                                        message("notify.exportSucceed.message") + "<a href='" + jsonUrl + "'>" + jsonUrl + "</a>");
-                            } catch (MalformedURLException e) {
-                                LOG.warn("Failed to build URL for exported JSON file", e);
-                            }
-
+                            // Body is plain-text path; the notification carries a
+                            // "Show in Finder/Explorer/Files" action button (see
+                            // NotifyUtil.showInfoNotificationWithReveal).
+                            NotifyUtil.showInfoNotificationWithReveal(
+                                    project,
+                                    PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
+                                    message("notify.exportSucceed.json.title"),
+                                    message("notify.exportSucceed.message") + " " + jsonPath,
+                                    jsonPath);
                         }
                     }
             );
@@ -152,17 +147,12 @@ public class ExportUtil {
                         return;
                     }
 
-                    // 通知: 导出成功: 因为前面没有抛出异常 能运行到这里说明保存已经成功
-                    try {
-                        URL mdUrl = mdPath.toUri().toURL();
-                        NotifyUtil.showInfoNotification(
-                                project,
-                                PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
-                                message("notify.exportSucceed.markdown.title"),
-                                message("notify.exportSucceed.message") + "<a href='" + mdUrl + "'>" + mdUrl + "</a>");
-                    } catch (MalformedURLException e) {
-                        LOG.warn("Failed to build URL for exported Markdown file", e);
-                    }
+                    NotifyUtil.showInfoNotificationWithReveal(
+                            project,
+                            PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
+                            message("notify.exportSucceed.markdown.title"),
+                            message("notify.exportSucceed.message") + " " + mdPath,
+                            mdPath);
                 }
             });
         } else {
@@ -250,17 +240,12 @@ public class ExportUtil {
                     done++;
                     indicator.setFraction((double) done / total);
                 }
-                try {
-                    URL dirUrl = dirPath.toUri().toURL();
-                    NotifyUtil.showInfoNotification(
-                            project,
-                            PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
-                            message("notify.exportSucceed.markdownTree.title"),
-                            message("notify.exportSucceed.markdownTree.message", noteCount)
-                                    + "<a href='" + dirUrl + "'>" + dirUrl + "</a>");
-                } catch (MalformedURLException e) {
-                    LOG.warn("Failed to build URL for exported Markdown tree", e);
-                }
+                NotifyUtil.showInfoNotificationWithReveal(
+                        project,
+                        PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
+                        message("notify.exportSucceed.markdownTree.title"),
+                        message("notify.exportSucceed.markdownTree.message", noteCount) + " " + dirPath,
+                        dirPath);
             }
         });
     }

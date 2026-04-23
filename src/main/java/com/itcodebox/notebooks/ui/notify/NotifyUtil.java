@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.ui.notify;
 
+import com.intellij.ide.actions.RevealFileAction;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -11,6 +12,7 @@ import com.itcodebox.notebooks.ui.toolsettings.AppSettingsConfigurable;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.datatransfer.StringSelection;
+import java.nio.file.Path;
 
 import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
 
@@ -18,10 +20,6 @@ import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
  * @author LeeWyatt
  */
 public class NotifyUtil {
-
-    private static final NotificationListener.UrlOpeningListener URL_OPENING_LISTENER = new NotificationListener.UrlOpeningListener(true);
-
-    //203的写法
 
     public static void showNotification(Project project, String displayId, String title, String content, NotificationType type) {
         Notification notification =  new Notification(PluginConstant.DEFAULT_NOTIFICATION_GROUP_ID,title, content, type);
@@ -31,6 +29,29 @@ public class NotifyUtil {
 
     public static void showInfoNotification(Project project, String displayId, String title, String message) {
         showNotification(project, displayId, title, message, NotificationType.INFORMATION);
+    }
+
+    /**
+     * Info-level notification with a "Show in Finder/Explorer/Files" action
+     * button that reveals {@code pathToReveal} in the OS file manager.
+     *
+     * <p>Previously export notifications embedded {@code <a href="file://…">}
+     * links expecting a {@code NotificationListener.UrlOpeningListener} to
+     * handle clicks. That listener was declared but never attached — the
+     * links rendered but did nothing. {@link NotificationAction} is the
+     * modern (2022.3+) equivalent and works reliably.
+     */
+    public static void showInfoNotificationWithReveal(Project project, String displayId, String title,
+                                                      String content, Path pathToReveal) {
+        Notification notification = new Notification(PluginConstant.DEFAULT_NOTIFICATION_GROUP_ID,
+                title, content, NotificationType.INFORMATION);
+        if (pathToReveal != null && RevealFileAction.isSupported()) {
+            String label = message("notify.action.showInFileManager.text",
+                    RevealFileAction.getFileManagerName());
+            notification.addAction(NotificationAction.createSimple(label,
+                    () -> RevealFileAction.openFile(pathToReveal.toFile())));
+        }
+        Notifications.Bus.notify(notification, project);
     }
 
     public static void showWarningNotification(Project project, String displayId, String title, String message) {
