@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.41</version>
+    <version>1.42</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -97,6 +97,32 @@
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>1.42</h3>
+
+<h4>Compatibility</h4>
+<ul>
+  <li>Migrated three Platform API usages flagged by the Marketplace verifier on 1.41:
+    <ul>
+      <li>Import JSON file chooser: replaced the <code>isFileSelectable</code> / <code>isFileVisible</code> anonymous-subclass override (scheduled for removal) with the <code>.withFileFilter()</code> builder.</li>
+      <li>Import name-conflict dialog: switched from the internal <code>MessagesService</code> to public <code>Messages.showDialog</code>. <b>Side-effect fix:</b> closing the dialog with the window-close button now correctly cancels the import — the old code silently defaulted to "overwrite".</li>
+      <li>"Export image" save dialog: migrated the deprecated three-arg <code>FileSaverDescriptor</code> constructor to the two-arg form.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>1.42 (中文)</h3>
+
+<h4>兼容性</h4>
+<ul>
+  <li>修掉了 1.41 上传 Marketplace 时兼容性验证报告里标注的三个 Platform API 使用：
+    <ul>
+      <li>导入 JSON 时的文件选择器：从 <code>isFileSelectable</code> / <code>isFileVisible</code> 匿名子类写法（已被标记为计划移除）换成 <code>.withFileFilter()</code> builder 风格。</li>
+      <li>导入时的同名冲突对话框：从内部 API <code>MessagesService</code> 换成公开 API <code>Messages.showDialog</code>。<b>顺带修了一个老 bug：</b>点对话框的 X 关闭按钮时，旧代码会静默按"覆盖"处理；现在正确地识别为"取消导入"。</li>
+      <li>导出单张图片时的保存对话框：把 deprecated 的三参 <code>FileSaverDescriptor</code> 构造器换成两参形式。</li>
+    </ul>
+  </li>
+</ul>
+
 <h3>1.41</h3>
 
 <h4>Compatibility</h4>
