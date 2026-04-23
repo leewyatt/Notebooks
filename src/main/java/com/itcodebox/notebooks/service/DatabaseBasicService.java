@@ -31,6 +31,11 @@ public class DatabaseBasicService {
     private  BasicDataSource source;
 
     public DatabaseBasicService() {
+        // 如果不存在,创建DB文件 (must run before backup so backups dir is created alongside).
+        createFileAndDir();
+        // 升级时自动备份 notebooks.db 到 ~/.ideaNotebooksFile/backups/ —
+        // 必须在 initTable() 的 ALTER TABLE 之前跑，保存迁移前的原始数据。
+        DatabaseBackupService.backupIfVersionChanged();
         try {
             //创建了DBCP的数据库连接池
             source = new BasicDataSource();
@@ -41,8 +46,6 @@ public class DatabaseBasicService {
         } catch (Exception e) {
             LOG.warn("Failed to initialize SQLite data source", e);
         }
-        // 如果不存在,创建DB文件
-        createFileAndDir();
         // 如果表不存在,创建表
         initTable();
     }

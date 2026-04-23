@@ -63,6 +63,13 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
      */
     public boolean showFocusBorder = true;
 
+    /**
+     * 最后一次成功启动时记录的插件版本号。用于触发"升级时自动备份"逻辑：
+     * 值不等于当前插件版本时 DatabaseBackupService 会拷贝一份 notebooks.db
+     * 到 backups 目录，然后把此字段更新为当前版本。字段仅新增不删除。
+     */
+    public String lastKnownPluginVersion = "";
+
 
     ///**
     // * 正在进行导入或者导出操作
