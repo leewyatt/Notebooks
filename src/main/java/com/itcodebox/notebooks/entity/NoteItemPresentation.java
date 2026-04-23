@@ -36,10 +36,11 @@ public class NoteItemPresentation implements ItemPresentation {
     @Nullable
     @Override
     public String getLocationString() {
-        SearchRecord searchRecord = NoteChooseByname.records.parallelStream().filter(record -> record.toString().equals(name))
-                .findFirst().get();
-        String description = searchRecord.getDescription();
-        return description;
+        return NoteChooseByname.getRecords().parallelStream()
+                .filter(record -> record.toString().equals(name))
+                .findFirst()
+                .map(SearchRecord::getDescription)
+                .orElse(null);
     }
 
     /**

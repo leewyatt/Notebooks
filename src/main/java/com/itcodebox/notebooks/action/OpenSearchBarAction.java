@@ -41,8 +41,11 @@ public class OpenSearchBarAction extends GotoActionBase {
 
                 // 获取被选中的对象
                 NoteNavigationItem chosenElement = (NoteNavigationItem) chooseByNamePopup.getChosenElement();
-                SearchRecord searchRecord = NoteChooseByname.records.parallelStream()
-                        .filter(p -> p.toString().equals(chosenElement.getValue())).findFirst().get();
+                SearchRecord searchRecord = NoteChooseByname.getRecords().parallelStream()
+                        .filter(p -> p.toString().equals(chosenElement.getValue())).findFirst().orElse(null);
+                if (searchRecord == null) {
+                    return;
+                }
 
                 NotebooksUIManager uiManager = e.getProject().getService(NotebooksUIManager.class);
                 MainPanel mainPanel = uiManager.getMainPanel();
