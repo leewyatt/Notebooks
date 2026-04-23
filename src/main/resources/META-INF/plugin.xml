@@ -11,83 +11,170 @@
                     color: #2675BF;
                     font-weight: bold;
                 }
-
-                li{
+                li {
                     margin-top: 7px;
+                }
+                h4 {
+                    margin-top: 14px;
+                    margin-bottom: 4px;
                 }
             </style>
         </head>
         <body>
-        <p>This is a note plugin. Support: store, manage, import, export notes.Support adding images as attachments</p>
+
+        <p><b>Notebook</b> is a code-aware, local-first note-taking plugin for IntelliJ-based IDEs. Capture snippets while you code, organize them in a three-level hierarchy, and keep everything in a single SQLite file on your own machine — <b>no cloud, no account, no telemetry</b>.</p>
+
+        <h4>Capture</h4>
         <ul>
-            <li style='margin-top:0px'>Three level directory is used to store notes: <br/><span>Notebook</span> > <span>Chapter</span> >
-                <span>Note</span></li>
-            <li><span>Compact View</span>: Suitable for small screens</li>
-            <li><span>Full View</span>: Suitable for large screens or organize notes</li>
-            <li>The list's item in the toolWindow can be dragged up and down to change the display position.</li>
-            <li>Move Chapter: Dragging chapter to another notebook.</li>
-            <li>Move Note: Dragging note to another chapter.</li>
-            <li>Use the popup menu(contextMenu) item <span>Add to Notebook</span> can add the selected code or text to the
-                notebook.
-            </li>
-            <li>Use the popup menu(contextMenu) item <span>Insert note into editor</span> can insert the content of the note
-                into the editor.
-            </li>
-            <li>Notebook's toolWindow button <span>Export JSON</span>/<span>Import JSON</span> Support export or import data.
-            </li>
-            <li>Notebook's toolWindow button <span>Export Markdown</span> Support exporting notes in <span>Markdown</span>
-                format.
-            </li>
-            <li><span>File | Settings | Tools | Notebook</span>: Support custom Markdown template .</li>
-            <li>Notebook's toolWindow button <span>Tips for using</span>: <span>More tips</span> and
-                <span>picture descriptions</span> can be displayed.
-            </li>
+            <li style='margin-top:0px'><span>Right-click &rarr; Add to Notebook</span> (Ctrl+\) — save selected code / text along with the source file path and selection range.</li>
+            <li><span>Right-click &rarr; Insert note into editor</span> (Ctrl+Shift+\) — paste a saved note at the caret.</li>
+            <li><span>Alt+S</span> — search notes by title, description, or full content.</li>
         </ul>
 
-        <p style='margin-top:10px'>这是一款笔记插件，支持笔记的存储，管理，导入，导出等。支持添加图片作为笔记的附件</p>
+        <h4>Organize</h4>
         <ul>
-            <li style='margin-top:0px'>使用三级目录来存储和管理笔记: <br/><span>笔记本</span> > <span>章节</span> > <span>笔记</span></li>
-            <li><span>精简视图</span>: 适合小屏幕</li>
-            <li><span>完整视图</span>: 适合大屏幕;显示更直观,拖拉操作更方便</li>
-            <li>笔记本工具窗口列表中的条目,支持上下拖动来改变的位置。</li>
-            <li>移动章节: 拖动章节条目到另一个的笔记本条目上。</li>
-            <li>移动笔记: 拖动笔记条目到另一个的章节条目上。</li>
-            <li>在编辑器使用弹出菜单项(上下文菜单项)<span>收藏到笔记本</span>可以把选择的代码或文字存储为笔记。</li>
-            <li>在编辑器使用弹出菜单项(上下文菜单项)<span>插入笔记内容</span>可以把选择的笔记内容插入到编辑器。</li>
-            <li>笔记本的工具窗口上的按钮<span>导出 JSON</span>/<span>导入 JSON</span>支持导入或者导出笔记。</li>
-            <li>笔记本的工具窗口上的按钮<span>导出 Markdown</span>支持把选择的笔记导出为<span>Markdown</span>格式。</li>
-            <li><span>File | Settings | Tools | 笔记本</span>: 支持自定义Markdown模板。</li>
-            <li>笔记本的工具窗口上的按钮<span>小提示</span>: 可以显示更多的使用提示和图片描述。</li>
+            <li>Three-level hierarchy: <span>Notebook</span> &gt; <span>Chapter</span> &gt; <span>Note</span>. Drag rows to reorder; drag a chapter onto another notebook to reparent, same for notes.</li>
+            <li>Attach images (JPG / PNG / GIF, up to 10 MB) with auto-generated thumbnails.</li>
+            <li>Layout dropdown switches between 1 / 2 / 3 / 4 column views — adapts to any screen size.</li>
+            <li>Column widths you set are remembered across IDE restarts.</li>
         </ul>
-        如果需要提交Bug或者提出建议,请加QQ群: <b>715598051</b><br/>
-        Thanks <b>@Yii.Guxing</b> ; <b>@albert flex</b>; <b>@因为许多.许多！</b>;<b>@来日方长</b> <br/>
+
+        <h4>Export &amp; backup</h4>
+        <ul>
+            <li><span>JSON export / import</span> — full round-trip of every notebook, chapter, note, and image.</li>
+            <li><span>Markdown export</span> — single-file Markdown per notebook, with a customizable Groovy template.</li>
+            <li><span>Markdown Tree export</span> — every note becomes its own <code>.md</code> file in a portable folder tree. Drop it straight into Obsidian or Typora.</li>
+            <li>Automatic SQLite backup on plugin version upgrade (last 5 kept).</li>
+        </ul>
+
+        <h4>Configure</h4>
+        <ul>
+            <li><span>File | Settings | Tools | Notebook</span> — customize the Markdown export template, font, and thumbnail size.</li>
+        </ul>
+
+        <p style='margin-top:14px'>Data directory: <code>~/.ideaNotebooksFile/</code>. Shared across all IDE projects on the same machine.</p>
+
+        <hr/>
+
+        <p><b>Notebook</b> 是一款为 IntelliJ 系 IDE 设计的<b>代码感知 + 本地优先</b>笔记插件。在编辑器里随手收藏代码片段，用三级目录组织，所有数据落在本机单个 SQLite 文件里 —— <b>无云端、无账号、无遥测</b>。</p>
+
+        <h4>收藏</h4>
+        <ul>
+            <li style='margin-top:0px'><span>右键 &rarr; 收藏到笔记本</span>（Ctrl+\）—— 保存选中代码/文字，同时记录来源文件路径和选区偏移。</li>
+            <li><span>右键 &rarr; 插入笔记内容</span>（Ctrl+Shift+\）—— 把已有的笔记内容粘贴到光标处。</li>
+            <li><span>Alt+S</span> —— 按标题、描述或正文全文检索笔记。</li>
+        </ul>
+
+        <h4>组织</h4>
+        <ul>
+            <li>三级目录：<span>笔记本</span> &gt; <span>章节</span> &gt; <span>笔记</span>。同级拖拽改顺序，拖到别的笔记本/章节改归属。</li>
+            <li>图片附件（JPG / PNG / GIF，最大 10 MB），自动生成缩略图。</li>
+            <li>布局下拉框一键切换 1 / 2 / 3 / 4 列视图，适应各种屏幕尺寸。</li>
+            <li>你拖拽调整过的列宽会被记住，下次打开恢复。</li>
+        </ul>
+
+        <h4>导出与备份</h4>
+        <ul>
+            <li><span>JSON 导入/导出</span> —— 笔记本 + 章节 + 笔记 + 图片的完整 round-trip 备份。</li>
+            <li><span>Markdown 导出</span> —— 按笔记本导出单文件 Markdown，Groovy 模板可自定义。</li>
+            <li><span>Markdown 文件树导出</span> —— 每条笔记一个 <code>.md</code>，按目录结构组织，可直接拖进 Obsidian 或 Typora。</li>
+            <li>插件版本升级时自动备份 SQLite（保留最近 5 份）。</li>
+        </ul>
+
+        <h4>设置</h4>
+        <ul>
+            <li><span>File | Settings | Tools | 笔记本</span> —— 自定义 Markdown 导出模板、字体、缩略图尺寸。</li>
+        </ul>
+
+        <p style='margin-top:14px'>数据目录：<code>~/.ideaNotebooksFile/</code>，同一台机器所有 IDE 项目共用。</p>
+
+        <hr/>
+
+        <p>Bug 反馈 / 建议：QQ 群 <b>715598051</b> · <a href="https://github.com/leewyatt/Notebooks/issues">GitHub Issues</a></p>
+        <p>Thanks <b>@Yii.Guxing</b>, <b>@albert flex</b>, <b>@因为许多.许多！</b>, <b>@来日方长</b>, <b>@tuhin47</b></p>
+
         </body>
-
     ]]></description>
 
     <change-notes><![CDATA[
 <h3>1.41</h3>
+
+<h4>Compatibility</h4>
 <ul>
-  <li><b>Automatic database backup on upgrade</b> — the first launch after installing a new plugin version copies <code>notebooks.db</code> to <code>~/.ideaNotebooksFile/backups/</code> before any schema migration. Last 5 backups retained.</li>
-  <li><b>Export as Markdown Tree</b> — new gear menu item exports every notebook/chapter/note into a portable folder tree (one <code>.md</code> per note, with YAML frontmatter and <code>_assets/</code> images). Friendly for migrating to Obsidian / Typora.</li>
-  <li>Compatibility: IntelliJ Platform Gradle Plugin v2, Gradle 8.14, updated SQLite (3.46), commons-dbcp2 (2.12), targets IDE 2023.3+ through current.</li>
-  <li>New UI: 20&times;20 tool window strip icon variant added.</li>
-  <li>Internal: printStackTrace replaced with <code>Logger</code> across 23 files — real errors now land in <code>idea.log</code> for bug reports.</li>
+  <li>Supports IntelliJ IDEA 2023.3 through current versions (no until-build cap). Initial 2024.3 compatibility fix contributed by <b>@tuhin47</b> via PR #19.</li>
+  <li>Rebuilt on IntelliJ Platform Gradle Plugin v2, Gradle 8.14, JBR 21.</li>
+  <li>Fixed SLF4J <code>LinkageError</code> at startup caused by newer commons-dbcp2 / sqlite-jdbc clashing with the platform classloader.</li>
 </ul>
-<h3>1.41 (zh)</h3>
+
+<h4>Data safety</h4>
 <ul>
-  <li><b>升级自动备份</b> — 每次安装新版本后首次启动，自动把 <code>notebooks.db</code> 备份到 <code>~/.ideaNotebooksFile/backups/</code>，保留最近 5 份。</li>
-  <li><b>导出为 Markdown 文件树</b> — 齿轮菜单新增一项，把全部笔记导出为目录树（每条笔记一个 <code>.md</code>，含 YAML 头和 <code>_assets/</code> 图片），方便迁移到 Obsidian/Typora。</li>
-  <li>兼容性：升级到 IntelliJ Platform Gradle Plugin v2、Gradle 8.14、SQLite 3.46、commons-dbcp2 2.12；支持 IDE 2023.3 及以上。</li>
-  <li>新版 UI：补充 20&times;20 工具窗口条形图标。</li>
-  <li>内部：23 个文件的 <code>printStackTrace</code> 替换为 <code>Logger</code>，错误现在会写入 <code>idea.log</code>，方便反馈。</li>
+  <li><b>Automatic backup on version upgrade</b> — first launch after installing copies <code>notebooks.db</code> to <code>~/.ideaNotebooksFile/backups/</code>. Last 5 retained.</li>
+  <li><b>Export as Markdown Tree</b> — gear menu exports every notebook / chapter / note into a portable folder tree (one <code>.md</code> per note, YAML frontmatter, <code>_assets/</code> images). Obsidian / Typora ready.</li>
+  <li>Cascade delete (notebook &rarr; chapters &rarr; notes) now transactional — no orphan rows on DB failure.</li>
+  <li>Path-traversal protection on image paths read from imported JSON.</li>
 </ul>
-<h3>1.40</h3>
+
+<h4>UX</h4>
 <ul>
-  <li>Add shortcut keys to the search action (default: Alt + S).</li>
-  <li>Adjusted the search dialog's UI.</li>
-  <li>给搜索功能添加快捷键(默认: ALT + S).</li>
-  <li>调整了搜索界面.</li>
+  <li><b>Splitter widths persist</b> between IDE restarts (<a href="https://github.com/leewyatt/Notebooks/issues/8">#8</a>).</li>
+  <li><b>Content-biased default layout</b> — detail pane gets the majority of width out of the box (<a href="https://github.com/leewyatt/Notebooks/issues/7">#7</a>).</li>
+  <li><b>Description font</b> matches the IDE's UI font by default instead of standing out (<a href="https://github.com/leewyatt/Notebooks/issues/6">#6</a>).</li>
+  <li>Layout switcher: the four confusing toggle icons replaced with a labeled dropdown (Full / Chapter+Note+Detail / Note+Detail / Detail only).</li>
+  <li>Rename-conflict warnings use theme-aware colors (readable in dark themes).</li>
+  <li>Export tasks now cancellable.</li>
+</ul>
+
+<h4>Performance</h4>
+<ul>
+  <li>LRU cache for image thumbnails — smoother scrolling, no per-click disk reads on EDT.</li>
+  <li>Note-type field auto-save debounced — one DB write per word instead of per keystroke.</li>
+</ul>
+
+<h4>Under the hood</h4>
+<ul>
+  <li>Apache 2.0 LICENSE added; bilingual README (English + 简体中文).</li>
+  <li><code>printStackTrace</code> replaced with IntelliJ <code>Logger</code> across 23 files — errors now land in <code>idea.log</code>.</li>
+  <li>Go-to-Symbol contributor made thread-safe (prevents rare stale results in multi-project sessions).</li>
+</ul>
+
+<h3>1.41 (中文)</h3>
+
+<h4>兼容性</h4>
+<ul>
+  <li>支持 IntelliJ IDEA 2023.3 及以后所有版本（无 until-build 上限）。2024.3 兼容性最初的补丁由 <b>@tuhin47</b> 通过 PR #19 提供。</li>
+  <li>构建链迁移到 IntelliJ Platform Gradle Plugin v2、Gradle 8.14、JBR 21。</li>
+  <li>修复了新版 commons-dbcp2 / sqlite-jdbc 在 IntelliJ 插件加载器里引发的 SLF4J <code>LinkageError</code> 启动崩溃。</li>
+</ul>
+
+<h4>数据安全</h4>
+<ul>
+  <li><b>版本升级自动备份</b>：首次启动新版本时自动把 <code>notebooks.db</code> 备份到 <code>~/.ideaNotebooksFile/backups/</code>，保留最近 5 份。</li>
+  <li><b>Markdown 文件树导出</b>：齿轮菜单新增一项，把全部笔记导出为目录树（每条一个 <code>.md</code>，含 YAML 头和 <code>_assets/</code> 图片目录），可直接放进 Obsidian / Typora。</li>
+  <li>删除笔记本 &rarr; 章节 &rarr; 笔记的级联删除改为事务操作，避免中途失败留下孤儿数据。</li>
+  <li>导入 JSON 时对图片路径做防穿越校验。</li>
+</ul>
+
+<h4>交互改进</h4>
+<ul>
+  <li><b>拖拽后的列宽记住了</b>：重启 IDE 不再被重置（<a href="https://github.com/leewyatt/Notebooks/issues/8">#8</a>）。</li>
+  <li><b>默认布局偏向内容区</b>：详情面板占大部分宽度（<a href="https://github.com/leewyatt/Notebooks/issues/7">#7</a>）。</li>
+  <li><b>描述区字体</b>默认与 IDE UI 字体一致，不再刻意放大（<a href="https://github.com/leewyatt/Notebooks/issues/6">#6</a>）。</li>
+  <li>显示模式切换：原来 4 个含义混乱的图标换成一个带文字的下拉框（完整 / 章节+笔记+详情 / 笔记+详情 / 仅详情）。</li>
+  <li>重命名冲突的提示色适配暗色主题，深色背景下也清晰可读。</li>
+  <li>导出任务现在可以取消。</li>
+</ul>
+
+<h4>性能</h4>
+<ul>
+  <li>图片缩略图加 LRU 缓存，切换图片不再每次读盘。</li>
+  <li>笔记类型字段自动保存加防抖，每个单词只写一次 DB 而不是每个按键。</li>
+</ul>
+
+<h4>内部改进</h4>
+<ul>
+  <li>新增 Apache 2.0 LICENSE；README 中英双语。</li>
+  <li>23 个文件的 <code>printStackTrace</code> 换成了 IntelliJ <code>Logger</code>，错误能写入 <code>idea.log</code> 方便排查。</li>
+  <li>Go-to-Symbol 贡献器改为线程安全，多项目同开时不会出现搜索结果互串。</li>
 </ul>
     ]]></change-notes>
 
