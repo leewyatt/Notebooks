@@ -16,9 +16,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
@@ -225,9 +223,10 @@ public class CustomUIUtil {
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         graphics.drawImage(originImage, 0, 0, null);
         graphics.dispose();
-        OutputStream out = new FileOutputStream(destFile);
+        // ImageIO.write(destImage, extension, destFile) opens its own stream internally;
+        // the previous code also allocated a FileOutputStream that was never used and
+        // leaked on exception. Removed.
         ImageIO.write(destImage, extension, destFile);
-        out.close();
     }
 
 }

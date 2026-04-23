@@ -419,10 +419,9 @@ public class ExportUtil {
         ChapterServiceImpl chapterService = ChapterServiceImpl.getInstance();
         NoteServiceImpl noteService = NoteServiceImpl.getInstance();
         LinkedHashMap<Notebook, LinkedHashMap<Chapter, List<Note>>> map = new LinkedHashMap<>(1);
-        List<Notebook> notebookList = Collections.singletonList(notebookService.findById(notebookId));
-        for (Notebook notebook : notebookList) {
-            Integer tempNotebookId = notebook.getId();
-            List<Chapter> chapterList = chapterService.findAllByNotebookId(tempNotebookId);
+        Notebook notebook = notebookService.findById(notebookId);
+        if (notebook != null) {
+            List<Chapter> chapterList = chapterService.findAllByNotebookId(notebook.getId());
             LinkedHashMap<Chapter, List<Note>> noteMap = new LinkedHashMap<>(50);
             for (Chapter chapter : chapterList) {
                 List<Note> noteList = noteService.findAllByChapterId(chapter.getId());

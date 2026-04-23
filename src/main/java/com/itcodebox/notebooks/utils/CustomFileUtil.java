@@ -192,6 +192,7 @@ public class CustomFileUtil {
      */
     public static void exportImagesToDirectory(List<String> imageRecords, File destDir) throws IOException {
         Path destDirPath = destDir.toPath();
+        int missing = 0;
         for (String imgRecordStr : imageRecords) {
             if (imgRecordStr == null || imgRecordStr.trim().isEmpty()) {
                 continue;
@@ -206,7 +207,12 @@ public class CustomFileUtil {
                     }
                     File fromFile = fromPath.toFile();
                     File toFile = toPath.toFile();
-                    if (!fromFile.exists() || toFile.exists()) {
+                    if (toFile.exists()) {
+                        continue;
+                    }
+                    if (!fromFile.exists()) {
+                        missing++;
+                        LOG.warn("Image referenced by a note is missing on disk: " + fromFile);
                         continue;
                     }
                     FileUtil.copy(fromFile, toFile);
@@ -214,6 +220,12 @@ public class CustomFileUtil {
                     LOG.warn("Failed to copy image file to export directory", exception);
                 }
             }
+        }
+        if (missing > 0) {
+            // Caller (ExportUtil) can decide whether to surface this; log.warn makes
+            // the count discoverable from idea.log when users report "my export is
+            // missing pictures".
+            LOG.warn(missing + " image file(s) referenced by notes were missing and skipped during export.");
         }
     }
 

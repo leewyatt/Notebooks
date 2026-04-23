@@ -199,15 +199,16 @@ public class DatabaseBasicService {
      * @return true 存在该字段 false 不存在该字段
      * @throws SQLException sql异常
      */
-    private boolean isColumnExists (String table, String column,QueryRunner queryRunner ) throws SQLException {
-        boolean isExists = false;
-        List<String> name = queryRunner.query("PRAGMA table_info("+table+")", new ColumnListHandler<String>("name"));
+    private boolean isColumnExists(String table, String column, QueryRunner queryRunner) throws SQLException {
+        List<String> name = queryRunner.query("PRAGMA table_info(" + table + ")", new ColumnListHandler<String>("name"));
+        if (name == null) {
+            return false;
+        }
         for (String s : name) {
             if (column.equalsIgnoreCase(s)) {
-                isExists = true;
-                break;
+                return true;
             }
         }
-        return isExists;
+        return false;
     }
 }

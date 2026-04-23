@@ -64,6 +64,13 @@ public class ImportUtil {
                 Set<Map.Entry<Notebook, LinkedHashMap<Chapter, List<Note>>>> entries = notebookCollection.entrySet();
                 int size = entries.size();
                 if (size == 0) {
+                    // Notify so the user knows nothing was imported — silent
+                    // return gave the impression of a successful import.
+                    NotifyUtil.showInfoNotification(
+                            project,
+                            PluginConstant.NOTIFICATION_ID_IMPORT_EXPORT,
+                            message("notify.import.close.title"),
+                            message("notify.import.empty.message"));
                     return;
                 }
                 int index = 0;
@@ -300,10 +307,6 @@ public class ImportUtil {
     private static void addNotesFromJson(ProgressIndicator indicator, Notebook notebookInDb, Map.Entry<Chapter, List<Note>> chapterListEntry, Chapter chapterInDb) {
         List<Note> noteList = chapterListEntry.getValue();
         Note[] notes = new Note[noteList.size()];
-        for (Note note : noteList) {
-            note.setNotebookId(notebookInDb.getId());
-            note.setChapterId(chapterInDb.getId());
-        }
         for (int j = 0; j < noteList.size(); j++) {
             Note note = noteList.get(j);
             note.setNotebookId(notebookInDb.getId());

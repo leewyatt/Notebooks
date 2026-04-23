@@ -43,9 +43,11 @@ public class MainPanel extends JPanel {
     private final NotebookPanel notebookPanel;
     private final DetailPanel detailPanel;
     private final ProjectStorage projectStorage;
-    private final JBSplitter leftPane = new JBSplitter(false, 0.5f);
-    private final JBSplitter rightPane = new JBSplitter(false, 0.5F);
-    private final JBSplitter contentPane = new JBSplitter(false, 0.5f);
+    /** Initial split ratio for all three top-level splitters (50/50). */
+    private static final float DEFAULT_SPLITTER_RATIO = 0.5f;
+    private final JBSplitter leftPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
+    private final JBSplitter rightPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
+    private final JBSplitter contentPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
 
 
 
