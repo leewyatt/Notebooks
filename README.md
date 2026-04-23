@@ -94,15 +94,17 @@ Nothing is locked in.
 Requires JDK 21 (JBR 21 recommended; pinned by `gradle.properties` → `org.gradle.java.home`).
 
 ```bash
-# compile + package
+# compile + run tests + assemble a jar (fast sanity check during development)
 ./gradlew build
-# launch a sandbox IDE with the plugin installed            
+# produce the Marketplace-ready plugin ZIP at build/distributions/Notebook-<version>.zip
+./gradlew buildPlugin
+# launch a sandbox IDE with the plugin pre-installed (for local smoke tests)
 ./gradlew runIde
-# run JetBrains Plugin Verifier (multi-IDE compat)           
-./gradlew verifyPlugin     
+# run JetBrains Plugin Verifier against target IDE builds (API compatibility scan; slow on first run)
+./gradlew verifyPlugin
 ```
 
-The built plugin ZIP lands in `build/distributions/`.
+The file you upload to JetBrains Marketplace is the ZIP produced by `./gradlew buildPlugin` at `build/distributions/Notebook-<version>.zip`.
 
 ## Project layout (quick map)
 

@@ -94,15 +94,17 @@ English: [README.md](./README.md)
 需要 JDK 21（推荐 JBR 21，已在 `gradle.properties` 的 `org.gradle.java.home` 钉住）。
 
 ```bash
-# 编译 + 打包
-./gradlew build            
-# 启动一个 sandbox IDE，已装本插件
-./gradlew runIde 
- # 跑 JetBrains Plugin Verifier 多版本兼容检查          
-./gradlew verifyPlugin    
+# 编译 + 跑测试 + 打 jar（开发时的快速健全性检查）
+./gradlew build
+# 产出可上传 Marketplace 的插件 ZIP：build/distributions/Notebook-<版本>.zip
+./gradlew buildPlugin
+# 启动一个 sandbox IDE，已装本插件（本地烟测用）
+./gradlew runIde
+# 针对目标 IDE 版本跑 JetBrains Plugin Verifier（API 兼容性扫描，首次较慢）
+./gradlew verifyPlugin
 ```
 
-构建产物在 `build/distributions/`。
+上传到 JetBrains Marketplace 的文件，就是 `./gradlew buildPlugin` 产出的 `build/distributions/Notebook-<版本>.zip`。
 
 ## 工程结构（速查）
 
