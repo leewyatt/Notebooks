@@ -25,6 +25,24 @@ public class ProjectStorage implements PersistentStateComponent<ProjectStorage> 
     public int selectedChapterId = -1;
     public int selectedNoteId = -1;
 
+    /**
+     * Splitter proportions, persisted per-project so that resized column widths
+     * survive an IDE restart (fixes GitHub #8: "default width"). Defaults picked
+     * per GitHub #7 ("界面四块区域的布局比例"): the original 0.5/0.5/0.5 equal
+     * split left too little room for note content — these ratios give roughly
+     *
+     *     notebook : chapter : note : detail  =  15% : 15% : 14% : 56%
+     *
+     * of the tool-window width when all four columns are visible.
+     *
+     * MainPanel writes back to these fields on every proportion change, so
+     * manual resizes are saved automatically without any explicit "save now"
+     * action.
+     */
+    public float contentPaneProportion = 0.3f;  // (notebook+chapter) : (note+detail)
+    public float leftPaneProportion = 0.5f;     // notebook : chapter
+    public float rightPaneProportion = 0.2f;    // note : detail
+
 
     @Override
     public @Nullable

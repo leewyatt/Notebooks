@@ -32,6 +32,7 @@ import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.*;
 import com.intellij.ui.components.panels.HorizontalBox;
 import com.intellij.util.ui.JBEmptyBorder;
+import com.intellij.util.ui.JBFont;
 import com.itcodebox.notebooks.action.SearchRecordAction;
 import com.itcodebox.notebooks.constant.PluginColors;
 import com.itcodebox.notebooks.constant.PluginConstant;
@@ -118,6 +119,21 @@ public class DetailPanel extends JPanel {
     private static final int FILE_TYPE_DEBOUNCE_MS = 500;
     private final Alarm fileTypeDebounceAlarm;
 
+    /**
+     * Pick the font for the description TextArea. If the user's saved custom
+     * font equals the plugin's original defaults (MONOSPACED, 18pt), assume
+     * they never explicitly picked those values and show the IDE regular UI
+     * font so the description matches other components in the panel. Otherwise
+     * honor their choice.
+     */
+    private static Font resolveDescFont(AppSettingsState settings) {
+        boolean usingPluginDefaults = Font.MONOSPACED.equals(settings.customFontName)
+                && settings.customFontSize == 18;
+        return usingPluginDefaults
+                ? JBFont.regular()
+                : new Font(settings.customFontName, Font.PLAIN, settings.customFontSize);
+    }
+
     private final String URL_REG = "\\s*((http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)\\s*";
     private final Pattern urlPattern = Pattern.compile(URL_REG);
     private final ItemListener notebookItemListener;
@@ -169,7 +185,6 @@ public class DetailPanel extends JPanel {
         uiManager = project.getService(NotebooksUIManager.class);
         projectStorage = project.getService(ProjectStorage.class);
         AppSettingsState appSettingsState = AppSettingsState.getInstance();
-        Font textFont = new Font(appSettingsState.customFontName, Font.PLAIN, appSettingsState.customFontSize);
         setLayout(new BorderLayout());
 
         //1. ------创建顶部的界面-----------
@@ -180,8 +195,15 @@ public class DetailPanel extends JPanel {
 
         //1. 笔记描述和笔记内容的容器
         JBSplitter textPanel = new JBSplitter(true, 0.15F);
-        // 设置笔记描述组件
-        fieldDesc.setFont(textFont);
+        // GitHub #6 ("font in description is a little bigger than other"):
+        // the plugin's original defaults (MONOSPACED, 18pt) made the description
+        // TextArea visibly bigger than the surrounding combos / labels / type
+        // field. If the user never customized the font, show the IDE regular
+        // UI font so everything in this panel looks consistent. If the user
+        // DID pick a different value in Settings → Tools → Notebook, respect
+        // that choice. The AppSettingsChangedListener keeps fieldDesc in sync
+        // when the user changes the setting later.
+        fieldDesc.setFont(resolveDescFont(appSettingsState));
         descScrollPane = new JPanel(new BorderLayout(0, 5));
         descScrollPane.add(initDescriptionPanel(), BorderLayout.NORTH);
         descScrollPane.add(new JBScrollPane(fieldDesc));

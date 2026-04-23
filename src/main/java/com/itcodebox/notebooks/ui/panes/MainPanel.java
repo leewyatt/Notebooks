@@ -43,11 +43,13 @@ public class MainPanel extends JPanel {
     private final NotebookPanel notebookPanel;
     private final DetailPanel detailPanel;
     private final ProjectStorage projectStorage;
-    /** Initial split ratio for all three top-level splitters (50/50). */
-    private static final float DEFAULT_SPLITTER_RATIO = 0.5f;
-    private final JBSplitter leftPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
-    private final JBSplitter rightPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
-    private final JBSplitter contentPane = new JBSplitter(false, DEFAULT_SPLITTER_RATIO);
+    // Proportions are applied from ProjectStorage in the constructor, not at
+    // field init — the ProjectStorage service isn't available yet at this point.
+    // The default JBSplitter(false) constructor starts at 0.5 but we always
+    // overwrite that via setProportion() before the component is shown.
+    private final JBSplitter leftPane = new JBSplitter(false);
+    private final JBSplitter rightPane = new JBSplitter(false);
+    private final JBSplitter contentPane = new JBSplitter(false);
 
 
 
@@ -137,6 +139,20 @@ public class MainPanel extends JPanel {
         contentPane.setFirstComponent(leftPane);
         contentPane.setSecondComponent(rightPane);
         add(contentPane);
+
+        // Apply persisted splitter proportions (GitHub #8) and wire write-back so
+        // every drag is saved. The "proportion" PropertyChangeEvent fires even on
+        // programmatic setProportion calls — that's fine, the write-back is
+        // idempotent (sets a float to the same float).
+        contentPane.setProportion(projectStorage.contentPaneProportion);
+        leftPane.setProportion(projectStorage.leftPaneProportion);
+        rightPane.setProportion(projectStorage.rightPaneProportion);
+        contentPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.contentPaneProportion = contentPane.getProportion());
+        leftPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.leftPaneProportion = leftPane.getProportion());
+        rightPane.addPropertyChangeListener("proportion",
+                e -> projectStorage.rightPaneProportion = rightPane.getProportion());
 
         //1. 恢复组件的可见状态
         resetPanesVisible();
