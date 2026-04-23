@@ -31,8 +31,18 @@ dependencies {
         )
     }
 
-    // SQLite + connection pool (upgraded from dbcp 1.4 / pool 1.6 to dbcp2)
-    implementation("org.apache.commons:commons-dbcp2:2.12.0")
+    // SQLite + connection pool.
+    //
+    // dbcp2 pinned to 2.9.0 (not the latest 2.12.0) because starting with 2.10.0
+    // the transitive commons-logging jumped from 1.2 to 1.3.x, whose new
+    // Slf4jLogFactory auto-bridges to SLF4J. Inside the IntelliJ runtime that
+    // triggers a LinkageError: the platform and plugin classloaders see two
+    // different org.slf4j.ILoggerFactory Class objects when BasicDataSource's
+    // <clinit> asks for a Log. 2.9.0 still uses commons-logging 1.2 which logs
+    // via java.util.logging — no SLF4J bridge, no conflict. API (setMaxTotal,
+    // setDriverClassName, etc.) is unchanged from our usage in
+    // DatabaseBasicService.
+    implementation("org.apache.commons:commons-dbcp2:2.9.0")
     implementation("commons-dbutils:commons-dbutils:1.8.1")
     implementation("org.xerial:sqlite-jdbc:3.46.1.0")
 
