@@ -1,16 +1,20 @@
 package com.itcodebox.notebooks.dao.impl;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.itcodebox.notebooks.dao.BaseDAO;
 import com.itcodebox.notebooks.dao.ChapterDao;
 import com.itcodebox.notebooks.entity.Chapter;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
  * @author LeeWyatt
  */
 public class ChapterDaoImpl extends BaseDAO<Chapter> implements ChapterDao {
+
+    private static final Logger LOG = Logger.getInstance(ChapterDaoImpl.class);
 
     private ChapterDaoImpl() {
     }
@@ -59,10 +63,34 @@ public class ChapterDaoImpl extends BaseDAO<Chapter> implements ChapterDao {
 
     @Override
     public void delete(Connection conn, Integer id) {
-        String sql1 = "delete from note where chapter_id=?;";
-        update(conn, sql1, id);
-        String sql2 = "delete from chapter where id =?";
-        update(conn, sql2, id);
+        // Transactional cascade: drop notes first, then the chapter. If the
+        // second statement fails we rollback so the DB doesn't end up with
+        // notes pointing at a chapter that no longer exists.
+        //
+        // NOTE: bypass BaseDAO.update() (which swallows SQLException) —
+        // use queryRunner.update() so the catch block here can actually
+        // observe failures and rollback.
+        boolean originalAutoCommit = true;
+        try {
+            originalAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            queryRunner.update(conn, "delete from note where chapter_id=?;", id);
+            queryRunner.update(conn, "delete from chapter where id=?;", id);
+            conn.commit();
+        } catch (SQLException e) {
+            LOG.warn("Failed to delete chapter " + id + "; rolling back", e);
+            try {
+                conn.rollback();
+            } catch (SQLException rollbackEx) {
+                LOG.warn("Rollback failed after chapter delete error", rollbackEx);
+            }
+        } finally {
+            try {
+                conn.setAutoCommit(originalAutoCommit);
+            } catch (SQLException restoreEx) {
+                LOG.warn("Failed to restore autoCommit after chapter delete", restoreEx);
+            }
+        }
     }
 
     /**
