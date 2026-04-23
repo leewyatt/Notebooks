@@ -52,7 +52,7 @@ public class ExportUtil {
         if (file.exists() && file.isDirectory()) {
             //导出JSON,设置为不可取消
             ProgressManager.getInstance().run(
-                    new Task.Backgroundable(project, "Export JSON and Image Files", false) {
+                    new Task.Backgroundable(project, "Export JSON and Image Files", true) {
                         @Override
                         public void run(@NotNull ProgressIndicator indicator) {
                             indicator.setText("Export images...");
@@ -62,6 +62,7 @@ public class ExportUtil {
                             } catch (IOException e) {
                                 LOG.warn("Failed to copy image directory during JSON export", e);
                             }
+                            indicator.checkCanceled();
                             indicator.setText("Export data...");
                             //导出JSON
                             Path jsonPath = dirPath.resolve("notebook_" + fileTimeStr + ".json");
@@ -112,13 +113,14 @@ public class ExportUtil {
     public static void exportMarkdownFile(Project project, Path dirPath, Notebook notebook, String fileTimeStr) {
         File file = dirPath.toFile();
         if (file.exists() && file.isDirectory()) {
-            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export markdown file", false) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export markdown file", true) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     indicator.setText("Export images...");
                     String title = file.getName();
                     //1.导出图片
                     String assetsFileName = title + "_" + fileTimeStr + ".assets";
+                    indicator.checkCanceled();
                     try {
                         List<String> imagePathList = NoteServiceImpl.getInstance().getImageRecordsByNotebookId(notebook.getId());
                         CustomFileUtil.exportImagesToDirectory(imagePathList, dirPath.resolve(assetsFileName).toFile());
@@ -200,7 +202,7 @@ public class ExportUtil {
                     message("notify.exportError.message"));
             return;
         }
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export Markdown tree", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Export Markdown tree", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(false);
@@ -212,6 +214,7 @@ public class ExportUtil {
                 int done = 0;
                 int noteCount = 0;
                 for (Notebook notebook : notebooks) {
+                    indicator.checkCanceled();
                     indicator.setText("Exporting " + notebook.getTitle());
                     File notebookDir = dirPath.resolve(sanitizeFilename(notebook.getTitle())).toFile();
                     if (!notebookDir.exists() && !notebookDir.mkdirs()) {
@@ -232,6 +235,7 @@ public class ExportUtil {
                     }
                     List<Chapter> chapters = chapterService.findAllByNotebookId(notebook.getId());
                     for (Chapter chapter : chapters) {
+                        indicator.checkCanceled();
                         File chapterDir = new File(notebookDir, sanitizeFilename(chapter.getTitle()));
                         if (!chapterDir.exists() && !chapterDir.mkdirs()) {
                             LOG.warn("Failed to create chapter directory: " + chapterDir);
