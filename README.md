@@ -90,9 +90,12 @@ Nothing is locked in.
 Requires JDK 21 (JBR 21 recommended; pinned by `gradle.properties` → `org.gradle.java.home`).
 
 ```bash
-./gradlew build            # compile + package
-./gradlew runIde           # launch a sandbox IDE with the plugin installed
-./gradlew verifyPlugin     # run JetBrains Plugin Verifier (multi-IDE compat)
+# compile + package
+./gradlew build
+# launch a sandbox IDE with the plugin installed            
+./gradlew runIde
+# run JetBrains Plugin Verifier (multi-IDE compat)           
+./gradlew verifyPlugin     
 ```
 
 The built plugin ZIP lands in `build/distributions/`.
