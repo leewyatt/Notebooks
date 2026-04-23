@@ -2,6 +2,7 @@ package com.itcodebox.notebooks.ui.tables;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.itcodebox.notebooks.constant.PluginColors;
 import com.itcodebox.notebooks.entity.Note;
 import com.itcodebox.notebooks.projectservice.RecordListener;
 import com.itcodebox.notebooks.service.NoteService;
@@ -41,7 +42,7 @@ public class NoteTableCellEditor extends DefaultCellEditor implements TableCellE
                     message("notify.renameFailed.title"),
                     "<html><body>" +
                             message("notify.renameFailed.message1.note") +
-                            "<span style='color:red;font-weight: 700;'>" + title + " </span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + " </span>" +
                             message("notify.renameFailed.message2.null") +
                             "</body></html>");
             textField.setText(note.getTitle());
@@ -53,13 +54,13 @@ public class NoteTableCellEditor extends DefaultCellEditor implements TableCellE
                     message("notify.renameFailed.title"),
                     "<html><body>" +
                             message("notify.renameFailed.message1.note") +
-                            "<span style='color:red;font-weight: 700;'>" + title + "</span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + "</span>" +
                             message("notify.renameFailed.message2.exists") +
                             "<br />" +
                             message("notify.renameFailed.message3") +
-                            "<span style='color:blue;font-weight: 700;'>" + note.getTitle() + "</span>" +
+                            "<span style='color:" + PluginColors.emphasisHtmlColor() + ";font-weight: 700;'>" + note.getTitle() + "</span>" +
                             message("notify.renameFailed.message4") +
-                            "<span style='color:red;font-weight: 700;'>" + title + "</span>" +
+                            "<span style='color:" + PluginColors.warnHtmlColor() + ";font-weight: 700;'>" + title + "</span>" +
                             message("notify.renameFailed.message5") +
                             "</body></html>");
 

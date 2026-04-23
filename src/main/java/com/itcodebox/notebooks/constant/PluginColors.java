@@ -1,5 +1,6 @@
 package com.itcodebox.notebooks.constant;
 
+import com.intellij.ui.ColorUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 
@@ -15,10 +16,29 @@ public interface PluginColors {
     JBColor TEXT_TITLE_SELECTED = new JBColor(Gray._240, Gray._250);
     JBColor NOTE_GROUP_SELECTED = new JBColor(new Color(38, 117, 191), new Color(75, 110, 175));
     JBColor DROP_ON = new JBColor(new Color(138, 188, 241), new Color(119, 151, 212));
-    JBColor WARN_COLOR = new JBColor(new Color(219,88,96),new Color(199,84,80));
+    JBColor WARN_COLOR = new JBColor(new Color(219, 88, 96), new Color(199, 84, 80));
     Color INSERT_BALLOON_BORDER = new Color(64, 64, 64, 90);
 
     JBColor NORMAL_BORDER_COLOR = new JBColor(Gray._242, new Color(60, 63, 65));
     JBColor WARING_BORDER_COLOR = new JBColor(new Color(219, 88, 96), new Color(199, 84, 80));
 
+    /** Theme-aware blue emphasis for inline HTML in notifications. */
+    JBColor HTML_EMPHASIS_COLOR = new JBColor(new Color(30, 110, 200), new Color(110, 160, 230));
+
+    /**
+     * Inline HTML color for "warning / rejected title" text in notifications.
+     * Resolved per current theme at call time so it reads well on both
+     * light and dark backgrounds.
+     */
+    static String warnHtmlColor() {
+        return "#" + ColorUtil.toHex(WARN_COLOR);
+    }
+
+    /**
+     * Inline HTML color for "emphasis / existing title" text in notifications.
+     * Softer on dark backgrounds than a raw {@code color:blue}.
+     */
+    static String emphasisHtmlColor() {
+        return "#" + ColorUtil.toHex(HTML_EMPHASIS_COLOR);
+    }
 }
