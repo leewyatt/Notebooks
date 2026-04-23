@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
-import com.intellij.openapi.fileChooser.FileElement;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbAwareToggleAction;
@@ -303,27 +302,14 @@ public class NoteWindowFactory implements ToolWindowFactory, DumbAware {
                         .onRefresh();
 
 
-                //文件选择器
+                // JSON-only file chooser. Uses the builder-style withFileFilter()
+                // which replaces the old isFileVisible / isFileSelectable overrides
+                // — those were marked @ScheduledForRemoval by IntelliJ Platform
+                // (Marketplace verifier flagged them in the 1.41 compat report).
+                // Directories remain navigable regardless of the filter.
                 VirtualFile[] virtualFiles = FileChooserFactory.getInstance().createFileChooser(
-                        new FileChooserDescriptor(true, false, false, false, false, false) {
-                            private boolean isValidExtension(VirtualFile file) {
-                                String extension = file.getExtension();
-                                if (extension == null) {
-                                    return false;
-                                }
-                                return "json".equalsIgnoreCase(extension);
-                            }
-
-                            @Override
-                            public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
-                                return (file.isDirectory() || isValidExtension(file)) && (showHiddenFiles || !FileElement.isFileHidden(file));
-                            }
-
-                            @Override
-                            public boolean isFileSelectable(VirtualFile file) {
-                                return !file.isDirectory() && isValidExtension(file);
-                            }
-                        },
+                        new FileChooserDescriptor(true, false, false, false, false, false)
+                                .withFileFilter(file -> "json".equalsIgnoreCase(file.getExtension())),
                         project, null)
                         .choose(project);
                 if (virtualFiles.length < 1) {

@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
-import com.intellij.openapi.ui.messages.MessagesService;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.entity.*;
@@ -341,24 +340,39 @@ public class ImportUtil {
                 //3
                 message("notify.import.nameConflict.chooseAutoRename")
         };
-        DoNotAskOption.Adapter adapter = new DoNotAskOption.Adapter()
-        {
-            
+        // Messages.showDialog expects DialogWrapper.DoNotAskOption (nested),
+        // not the top-level com.intellij.openapi.ui.DoNotAskOption. Both exist
+        // in modern Platform; the two are not convertible between each other.
+        DialogWrapper.DoNotAskOption.Adapter adapter = new DialogWrapper.DoNotAskOption.Adapter() {
             @Override
-            public void rememberChoice (boolean isSelected, int exitCode)
-            {
+            public void rememberChoice(boolean isSelected, int exitCode) {
+                // Persist only the "do not ask again" state; exit code comes
+                // from Messages.showDialog's return value below (more reliable
+                // — it's populated even when the user closes the dialog with
+                // the window close button, giving us a real -1 = CHOOSE_CLOSE
+                // instead of silently defaulting to 0 = CHOOSE_OVERWRITE).
                 userChoose.setDoNotAsk(isSelected);
-                userChoose.setExitCode(exitCode);
             }
-            
+
             @Override
-            public @NotNull String getDoNotShowMessage ()
-            {
+            public @NotNull String getDoNotShowMessage() {
                 return message("notify.import.nameConflict.rememberChoose");
             }
         };
-        
-        MessagesService.getInstance().showMessageDialog(null, null, message, msgTitle, options, 1, -1, Messages.getWarningIcon(), adapter, false, null);
+
+        // Replaces the @ApiStatus.Internal MessagesService.showMessageDialog
+        // (flagged by Marketplace verifier on 1.41 report). Messages.showDialog
+        // is the public equivalent and returns the clicked option index, or
+        // -1 if the dialog was dismissed.
+        int exitCode = Messages.showDialog(
+                (Project) null,
+                message,
+                msgTitle,
+                options,
+                1,
+                Messages.getWarningIcon(),
+                adapter);
+        userChoose.setExitCode(exitCode);
         return userChoose;
     }
 

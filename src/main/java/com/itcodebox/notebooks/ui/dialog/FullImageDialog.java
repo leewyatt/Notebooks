@@ -107,9 +107,13 @@ public class FullImageDialog extends DialogWrapper {
                 }
 
                 //3. IO输出
+                // The old 3-arg FileSaverDescriptor(title, description, extensions...)
+                // constructor is deprecated. The 2-arg form is the modern API;
+                // the save dialog defaults filename from the second save() arg,
+                // which already carries the correct extension (file.getName()).
                 VirtualFileWrapper targetFileWrapper = FileChooserFactory.getInstance().createSaveFileDialog(
-                        new FileSaverDescriptor(message("fullImageDialog.fileChooser.title")
-                                , "", StringUtil.getExtension(file.getName())), project).save((VirtualFile) null, file.getName());
+                        new FileSaverDescriptor(message("fullImageDialog.fileChooser.title"), ""),
+                        project).save((VirtualFile) null, file.getName());
                 //情况2: 用户没有选择文件或者文件夹, 返回
                 if (targetFileWrapper == null) {
                     return;
