@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.42</version>
+    <version>1.43</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -97,6 +97,20 @@
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>1.43</h3>
+
+<h4>Compatibility</h4>
+<ul>
+  <li>Fixed the internal-API usage flagged <b>red</b> by the Marketplace compatibility verifier on 1.42: the version-upgrade backup now resolves the plugin descriptor through the public <code>PluginManager.findEnabledPlugin</code> API instead of the internal <code>PluginManagerCore.getPlugin</code>.</li>
+</ul>
+
+<h3>1.43 (中文)</h3>
+
+<h4>兼容性</h4>
+<ul>
+  <li>修掉了 1.42 上传 Marketplace 时兼容性验证报告里<b>爆红</b>的内部 API 调用：版本升级自动备份功能改用公开 API <code>PluginManager.findEnabledPlugin</code> 获取插件描述符，替代内部 API <code>PluginManagerCore.getPlugin</code>。</li>
+</ul>
+
 <h3>1.42</h3>
 
 <h4>Compatibility</h4>

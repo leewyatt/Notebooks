@@ -1,6 +1,6 @@
 package com.itcodebox.notebooks.service;
 
-import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginDescriptor;
 import com.intellij.openapi.extensions.PluginId;
@@ -64,7 +64,7 @@ public final class DatabaseBackupService {
     }
 
     private static String resolveCurrentVersion() {
-        PluginDescriptor descriptor = PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID));
+        PluginDescriptor descriptor = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(PLUGIN_ID));
         if (descriptor == null) {
             LOG.warn("Notebook plugin descriptor not found; skipping version-change backup");
             return null;
