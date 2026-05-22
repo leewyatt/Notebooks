@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.43</version>
+    <version>1.50</version>
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -97,17 +97,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.43</h3>
+<h3>1.50</h3>
 
 <h4>Compatibility</h4>
 <ul>
+  <li>Fixed a <b>critical</b> incompatibility with IntelliJ IDEA 2026.2 that broke Markdown export. The plugin now bundles its own Groovy runtime.</li>
   <li>Fixed the internal-API usage flagged <b>red</b> by the Marketplace compatibility verifier on 1.42: the version-upgrade backup now resolves the plugin descriptor through the public <code>PluginManager.findEnabledPlugin</code> API instead of the internal <code>PluginManagerCore.getPlugin</code>.</li>
 </ul>
 
-<h3>1.43 (中文)</h3>
+<h3>1.50 (中文)</h3>
 
 <h4>兼容性</h4>
 <ul>
+  <li>修复了在 IntelliJ IDEA 2026.2 上导致 Markdown 导出失败的<b>严重</b>不兼容。插件现在自带 Groovy 运行时。</li>
   <li>修掉了 1.42 上传 Marketplace 时兼容性验证报告里<b>爆红</b>的内部 API 调用：版本升级自动备份功能改用公开 API <code>PluginManager.findEnabledPlugin</code> 获取插件描述符，替代内部 API <code>PluginManagerCore.getPlugin</code>。</li>
 </ul>
 
@@ -227,6 +229,9 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <!-- Groovy (for the Markdown-export template engine) is bundled into the
+         plugin as a library — see build.gradle.kts — so no <depends> on the
+         IDE Groovy plugin is needed. -->
     <!--    <depends>org.intellij.plugins.markdown</depends>-->
     <!-- 如果需要查询Java的包名等情况,需要该xx.java依赖,高亮之类的也需要 -->
     <!--    <depends>com.intellij.modules.java</depends>-->

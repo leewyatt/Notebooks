@@ -31,6 +31,23 @@ dependencies {
         )
     }
 
+    // Markdown export renders a user-customizable Groovy template through
+    // groovy.text.SimpleTemplateEngine, which lives in Groovy's groovy-templates
+    // module. Through 2026.1 the IDE bundled a full Groovy in the platform lib/
+    // (a groovy-all-style groovy.jar), so the engine resolved implicitly with no
+    // declared dependency. 2026.2 slimmed the bundled Groovy down to the core
+    // (groovy.lang stays, the whole groovy.text package is gone), which makes
+    // ExportUtil.processToMarkdownString fail with NoClassDefFoundError.
+    //
+    // Bundle our own complete Groovy instead of depending on the IDE's Groovy
+    // plugin: the Groovy plugin only ships compiler/runtime helper jars and has
+    // never carried the groovy.text classes, and a <depends> on it would also
+    // stop the whole plugin from loading whenever the user disables it. Pulling
+    // groovy core + groovy-templates from the same release keeps groovy.lang and
+    // groovy.text version-consistent within the plugin classloader.
+    implementation("org.apache.groovy:groovy:4.0.24")
+    implementation("org.apache.groovy:groovy-templates:4.0.24")
+
     // SQLite + connection pool.
     //
     // dbcp2 pinned to 2.9.0 (not the latest 2.12.0) because starting with 2.10.0
