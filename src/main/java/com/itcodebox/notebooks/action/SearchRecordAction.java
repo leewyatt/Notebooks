@@ -7,6 +7,8 @@ import com.itcodebox.notebooks.ui.dialog.SearchDialog;
 import icons.PluginIcons;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
 
 /**
@@ -19,9 +21,20 @@ public class SearchRecordAction extends DumbAwareAction {
         super(message("detailPanel.action.search.text"), "", PluginIcons.Search);
     }
 
+    /**
+     * Unlike the sibling editor actions, this one has no menu-context guarantee:
+     * it also carries a global {@code alt s} shortcut and is reused in the note
+     * toolbar, so PROJECT is not guaranteed present. Guard it here (disable +
+     * hide when absent) instead of assuming non-null in {@link #actionPerformed}.
+     */
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabledAndVisible(e.getData(CommonDataKeys.PROJECT) != null);
+    }
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-        Project project = anActionEvent.getRequiredData(CommonDataKeys.PROJECT);
+        Project project = Objects.requireNonNull(anActionEvent.getData(CommonDataKeys.PROJECT), "PROJECT is missing");
         new SearchDialog(project).show();
     }
     

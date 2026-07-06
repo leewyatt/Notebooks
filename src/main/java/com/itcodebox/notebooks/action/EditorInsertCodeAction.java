@@ -9,6 +9,8 @@ import com.intellij.ui.BalloonImpl;
 import com.intellij.util.ui.JBUI;
 import com.itcodebox.notebooks.constant.PluginColors;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 import javax.swing.*;
 
 /**
@@ -37,8 +39,10 @@ public class EditorInsertCodeAction extends DumbAwareAction {
     
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
-        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
+        // update() guarantees these are present; getData() + requireNonNull keeps
+        // that fail-fast contract without the scheduled-for-removal getRequiredData.
+        Editor editor = Objects.requireNonNull(e.getData(CommonDataKeys.EDITOR), "EDITOR is missing");
+        Project project = Objects.requireNonNull(e.getData(CommonDataKeys.PROJECT), "PROJECT is missing");
         InsertPanelFactory factory = new InsertPanelFactory();
         JPanel insertCodePanel = factory.createInsertPanel(project, editor);
         

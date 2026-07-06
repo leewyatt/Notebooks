@@ -13,6 +13,8 @@ import com.itcodebox.notebooks.ui.dialog.AddNoteDialog;
 import com.itcodebox.notebooks.ui.toolsettings.AppSettingsState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import static com.itcodebox.notebooks.utils.NotebooksBundle.message;
 
 /**
@@ -41,17 +43,16 @@ public class EditorAddNoteAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        // e.getDate 和 e.getRequiredData 的区别,
-        // 1. e.getDate 可能返回null
-        //    e.getRequiredData 不会返回null ,如果为null ,那么会抛异常
-        // 2. 为了避免 e.getRequiredData返回null导致错误,所以在 update里进行了检查
-        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
+        // update() already guards project/editor/psiFile non-null; getData() +
+        // requireNonNull keeps that fail-fast contract without the
+        // scheduled-for-removal getRequiredData API.
+        Project project = Objects.requireNonNull(e.getData(CommonDataKeys.PROJECT), "PROJECT is missing");
         if (AppSettingsState.getInstance().readOnlyMode) {
             Messages.showInfoMessage(project, message("popupAction.busy.message"), message("popupAction.busy.title"));
             return;
         }
-        PsiFile psiFile = e.getRequiredData(CommonDataKeys.PSI_FILE);
-        Editor editor = e.getRequiredData(CommonDataKeys.EDITOR);
+        PsiFile psiFile = Objects.requireNonNull(e.getData(CommonDataKeys.PSI_FILE), "PSI_FILE is missing");
+        Editor editor = Objects.requireNonNull(e.getData(CommonDataKeys.EDITOR), "EDITOR is missing");
         // 获得选择开始的光标偏移量(当没有选择时, 主光标的位置一致)
         SelectionModel selectionModel = editor.getSelectionModel();
         int offsetStart = selectionModel.getSelectionStart();

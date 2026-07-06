@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("java")
     // Pinned to 2.11.0 (matches JavaFX Tools reference). The plugin will log a
@@ -79,6 +81,17 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
 
+intellijPlatform {
+    // Re-run the Marketplace compatibility check locally with `./gradlew verifyPlugin`.
+    // Targets the 2026.2 line (the report ran against IU-262.8377.35, an EAP that has
+    // since rolled forward to 262.8665.81 — EAP snapshots are not retained long-term).
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaUltimate, "262.8665.81")
+        }
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.toVersion(javaVersion)
     targetCompatibility = JavaVersion.toVersion(javaVersion)
@@ -92,6 +105,17 @@ tasks {
 
     test {
         useJUnitPlatform()
+    }
+
+    // Bake the Gradle pluginVersion into a resource so DatabaseBackupService can
+    // read the plugin's own version at runtime WITHOUT the platform plugin-registry
+    // APIs (PluginManager.findEnabledPlugin / getPluginByClass etc. all became
+    // @ApiStatus.Internal in the 2026.2 line). Scoped to the single file so other
+    // resources (plugin.xml, message bundles) are never template-expanded.
+    processResources {
+        filesMatching("notebook-build.properties") {
+            expand(mapOf("version" to pluginVersion))
+        }
     }
 
     patchPluginXml {

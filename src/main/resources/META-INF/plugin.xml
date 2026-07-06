@@ -1,7 +1,10 @@
 <idea-plugin>
     <id>com.itcodebox.leewyatt.notebooks.id</id>
     <name>Notebook</name>
-    <version>1.50</version>
+    <!-- <version> is injected at build time by patchPluginXml from the Gradle
+         pluginVersion (build.gradle.kts). Keep it out of source so there is a
+         single version source, shared with the notebook-build.properties
+         resource that DatabaseBackupService reads at runtime. -->
     <vendor email="leewyatt7788@gmail.com">LeeWyatt</vendor>
 
     <description><![CDATA[
@@ -235,14 +238,12 @@
     <!--    <depends>org.intellij.plugins.markdown</depends>-->
     <!-- 如果需要查询Java的包名等情况,需要该xx.java依赖,高亮之类的也需要 -->
     <!--    <depends>com.intellij.modules.java</depends>-->
-    <!--  Kotlin高亮  -->
-    <!--    <depends>org.jetbrains.kotlin</depends>-->
-    <!--  The supportsKotlinPluginMode declaration required by IDEA 2024.2.1+
-          lives in kotlin-doc.xml (loaded only when Kotlin is present). DevKit
-          can't follow config-file references when validating, so the warning
-          here is cosmetic. -->
-    <!--suppress PluginXmlValidity -->
-    <depends optional="true" config-file="kotlin-doc.xml">org.jetbrains.kotlin</depends>
+    <!-- No dependency on org.jetbrains.kotlin: this plugin uses no Kotlin IDE
+         plugin API (the kotlin.Unit / Function1 references are kotlin-stdlib
+         types bundled with the platform). Declaring the optional dependency only
+         triggered the Marketplace verifier's supportsKotlinPluginMode warning
+         without buying anything. Kotlin note highlighting stays working via the
+         keyword-based CustomFileHighlighter. -->
     <depends optional="true" config-file="java-doc.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="json-doc.xml">com.intellij.modules.json</depends>
     <depends optional="true" config-file="xml-doc.xml">com.intellij.modules.xml</depends>

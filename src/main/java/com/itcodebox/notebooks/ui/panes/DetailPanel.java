@@ -661,12 +661,16 @@ public class DetailPanel extends JPanel {
      */
     private JComponent buildLayoutComboBox() {
         ComboBox<LayoutMode> combo = new ComboBox<>(LayoutMode.values());
-        combo.setRenderer(SimpleListCellRenderer.create((label, mode, index) -> {
-            if (mode != null) {
-                label.setIcon(mode.getIcon());
-                label.setText(message(mode.getBundleKey()));
+        combo.setRenderer(new SimpleListCellRenderer<LayoutMode>() {
+            @Override
+            public void customize(@NotNull JList<? extends LayoutMode> list, LayoutMode mode,
+                                  int index, boolean selected, boolean hasFocus) {
+                if (mode != null) {
+                    setIcon(mode.getIcon());
+                    setText(message(mode.getBundleKey()));
+                }
             }
-        }));
+        });
         combo.setSelectedItem(projectStorage.layoutMode);
         combo.setToolTipText(message("mainPanel.layout.label"));
         combo.addActionListener(e -> {

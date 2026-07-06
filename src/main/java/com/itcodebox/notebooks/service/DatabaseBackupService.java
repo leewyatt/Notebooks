@@ -1,13 +1,11 @@
 package com.itcodebox.notebooks.service;
 
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.extensions.PluginDescriptor;
-import com.intellij.openapi.extensions.PluginId;
 import com.itcodebox.notebooks.constant.PluginConstant;
 import com.itcodebox.notebooks.ui.toolsettings.AppSettingsState;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -16,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 /**
@@ -31,7 +30,7 @@ import java.util.stream.Stream;
 public final class DatabaseBackupService {
 
     private static final Logger LOG = Logger.getInstance(DatabaseBackupService.class);
-    private static final String PLUGIN_ID = "com.itcodebox.leewyatt.notebooks.id";
+    private static final String BUILD_INFO_RESOURCE = "/notebook-build.properties";
     private static final String BACKUP_DIR_NAME = "backups";
     private static final String BACKUP_PREFIX = "notebooks_";
     private static final int KEEP_LAST_N_BACKUPS = 5;
@@ -64,12 +63,28 @@ public final class DatabaseBackupService {
     }
 
     private static String resolveCurrentVersion() {
-        PluginDescriptor descriptor = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(PLUGIN_ID));
-        if (descriptor == null) {
-            LOG.warn("Notebook plugin descriptor not found; skipping version-change backup");
+        // Read the plugin version baked in at build time (see build.gradle.kts
+        // processResources). Deliberately avoids the platform plugin-registry
+        // APIs — PluginManager.findEnabledPlugin / getPluginByClass and
+        // PluginManagerCore.getPlugin all became @ApiStatus.Internal in the
+        // 2026.2 line, which is what the Marketplace verifier flagged red.
+        try (InputStream in = DatabaseBackupService.class.getResourceAsStream(BUILD_INFO_RESOURCE)) {
+            if (in == null) {
+                LOG.warn("Build-info resource " + BUILD_INFO_RESOURCE + " not found; skipping version-change backup");
+                return null;
+            }
+            Properties props = new Properties();
+            props.load(in);
+            String version = props.getProperty("version");
+            if (version == null || version.isBlank()) {
+                LOG.warn("Notebook version missing in build-info; skipping version-change backup");
+                return null;
+            }
+            return version;
+        } catch (IOException e) {
+            LOG.warn("Failed to read Notebook build-info; skipping version-change backup", e);
             return null;
         }
-        return descriptor.getVersion();
     }
 
     private static void doBackup(String current, String previous) throws IOException {
