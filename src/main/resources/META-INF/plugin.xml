@@ -100,6 +100,28 @@
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>1.51</h3>
+
+<h4>Compatibility (IntelliJ IDEA 2026.2)</h4>
+<ul>
+  <li>Cleared the <b>internal-API</b> usage the Marketplace verifier flagged <b>red</b> on 2026.2. The whole <code>PluginManager</code> lookup surface became internal in 2026.2, so the 1.50 fix (<code>findEnabledPlugin</code>) tripped again. The version-upgrade backup no longer asks the platform for the plugin version at all — it reads a version stamped into the plugin at build time. Re-verified <b>Compatible</b> against IU-262.</li>
+  <li>Migrated the scheduled-for-removal <code>AnActionEvent.getRequiredData</code> to <code>getData</code> with explicit null handling across the editor actions.</li>
+  <li>Replaced the scheduled-for-removal <code>SimpleListCellRenderer.create</code> in the layout dropdown with a renderer subclass.</li>
+  <li>Removed the unused optional Kotlin dependency that triggered the <code>supportsKotlinPluginMode</code> compatibility warning — the plugin uses no Kotlin plugin API (Kotlin note highlighting is unaffected).</li>
+  <li>The search action now disables itself when no project is available instead of failing.</li>
+</ul>
+
+<h3>1.51 (中文)</h3>
+
+<h4>兼容性（IntelliJ IDEA 2026.2）</h4>
+<ul>
+  <li>清掉了 2026.2 兼容性验证报告里<b>爆红</b>的<b>内部 API</b> 调用。2026.2 把整片 <code>PluginManager</code> 查找 API 都标成了 internal，所以 1.50 的修法（<code>findEnabledPlugin</code>）又中招了。版本升级备份现在完全不向平台要版本号——改为读取构建时打进插件的版本资源。对 IU-262 重新验证结果为 <b>Compatible</b>。</li>
+  <li>把计划移除的 <code>AnActionEvent.getRequiredData</code> 迁移为 <code>getData</code> + 显式判空（编辑器相关 Action）。</li>
+  <li>布局下拉框里计划移除的 <code>SimpleListCellRenderer.create</code> 换成渲染器子类写法。</li>
+  <li>移除了没实际用途、却触发 <code>supportsKotlinPluginMode</code> 兼容性警告的可选 Kotlin 依赖——插件不使用任何 Kotlin 插件 API（Kotlin 笔记高亮不受影响）。</li>
+  <li>搜索动作在没有可用 project 时会自动禁用，而不再报错。</li>
+</ul>
+
 <h3>1.50</h3>
 
 <h4>Compatibility</h4>
